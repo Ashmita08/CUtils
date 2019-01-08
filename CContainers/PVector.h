@@ -8,6 +8,7 @@ typedef void **PVectorIterator;
 
 PVectorHandle PVector_Create (uint initialCapacity);
 void PVector_Destruct (PVectorHandle handle, void (*DestructCallback) (void **item));
+uint PVector_Size (PVectorHandle handle);
 
 PVectorIterator PVector_Begin (PVectorHandle handle);
 PVectorIterator PVector_End (PVectorHandle handle);
@@ -19,7 +20,9 @@ PVectorIterator PVector_Erase (PVectorHandle handle, PVectorIterator iterator);
 PVectorIterator PVectorIterator_Next (PVectorIterator iterator);
 PVectorIterator PVectorIterator_Previous (PVectorIterator iterator);
 void **PVectorIterator_ValueAt (PVectorIterator iterator);
+
 void PVectorIterator_ForEach (PVectorIterator begin, PVectorIterator end, void (*Callback) (void **item));
+void PVectorIterator_ForEachReversed (PVectorIterator begin, PVectorIterator last, void (*Callback) (void **item));
 
 void PVectorCallback_MoveLeft (void **item);
 void PVectorCallback_MoveRight (void **item);

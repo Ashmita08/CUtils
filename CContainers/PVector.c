@@ -27,6 +27,12 @@ void PVector_Destruct (PVectorHandle handle, void (*DestructCallback) (void **it
     free (vector);
 }
 
+uint PVector_Size (PVectorHandle handle)
+{
+    PVector *vector = (PVector *) handle;
+    return vector->size;
+}
+
 PVectorIterator PVector_Begin (PVectorHandle handle)
 {
     PVector *vector = (PVector *) handle;
@@ -54,7 +60,7 @@ PVectorIterator PVector_At (PVectorHandle handle, uint index)
 PVectorIterator PVector_Insert (PVectorHandle handle, PVectorIterator where, void *value)
 {
     PVector *vector = (PVector *) handle;
-    if (where < PVector_Begin (handle) || where >= PVector_End (handle))
+    if (where < PVector_Begin (handle) || where > PVector_End (handle))
     {
         CContainers_SetLastError (PVECTOR_ERROR_INCORRECT_ITERATOR);
         return NULL;
@@ -68,7 +74,9 @@ PVectorIterator PVector_Insert (PVectorHandle handle, PVectorIterator where, voi
         vector->buffer = realloc (vector->buffer, sizeof (void *) * vector->capacity);
     }
 
-    PVectorIterator_ForEach (PVectorIterator_Next (where), PVector_End (handle), PVectorCallback_MoveRight);
+    PVectorIterator_ForEachReversed (PVectorIterator_Next (where),
+            PVectorIterator_Previous (PVector_End (handle)), PVectorCallback_MoveRight);
+    
     *PVectorIterator_ValueAt (where) = value;
     return where;
 }
@@ -116,6 +124,15 @@ void PVectorIterator_ForEach (PVectorIterator begin, PVectorIterator end, void (
     {
         Callback (PVectorIterator_ValueAt (begin));
         begin = PVectorIterator_Next (begin);
+    }
+}
+
+void PVectorIterator_ForEachReversed (PVectorIterator begin, PVectorIterator last, void (*Callback) (void **item))
+{
+    while (last >= begin)
+    {
+        Callback (PVectorIterator_ValueAt (last));
+        last = PVectorIterator_Previous (last);
     }
 }
 
