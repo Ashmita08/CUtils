@@ -26,7 +26,8 @@ void PVectorSuite_Helper_IterateCheckNaturalOrdered ()
 
     while (iterator != PVector_End (pVectorHandle))
     {
-        if (**((int **) PVectorIterator_ValueAt (iterator)) != number)
+        int value = **((int **) PVectorIterator_ValueAt (iterator));
+        if (value != number)
         {
             printf ("\n        Value at %d (e/a): %d, %d.", number, number,
                     **((int **) PVectorIterator_ValueAt (iterator)));
@@ -58,6 +59,95 @@ void PVectorSuite_Helper_ItemAtCheckNaturalOrdered (int size)
     }
 }
 
+void PVectorSuite_Helper_InsertBackAndIterate (uint size)
+{
+    for (int number = 0; number < size; ++number)
+    {
+        int *value = malloc (sizeof (int));
+        *value = number;
+        PVector_Insert (pVectorHandle, PVector_End (pVectorHandle), value);
+
+        if (CContainers_GetLastError () != 0)
+        {
+            printf ("        CContainers internal error code: %d.\n", CContainers_GetLastError ());
+            CU_FAIL_FATAL ("CContainers internal error!");
+        }
+
+        PVectorSuite_Helper_IterateCheckNaturalOrdered ();
+    }
+
+    PVectorSuite_Helper_CheckSize (size);
+    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
+    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (size);
+}
+
+void PVectorSuite_Helper_InsertBeginAndIterate (uint size)
+{
+    for (int number = size - 1; number >= 0; --number)
+    {
+        int *value = malloc (sizeof (int));
+        *value = number;
+        PVector_Insert (pVectorHandle, PVector_Begin (pVectorHandle), value);
+
+        if (CContainers_GetLastError () != 0)
+        {
+            printf ("        CContainers internal error code: %d.\n", CContainers_GetLastError ());
+            CU_FAIL_FATAL ("CContainers internal error!");
+        }
+    }
+
+    PVectorSuite_Helper_CheckSize (size);
+    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
+    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (size);
+}
+
+void PVectorSuite_Helper_InsertMiddleAndIterate (uint size)
+{
+    if (size % 2 == 0)
+    {
+        ++size;
+    }
+
+    for (int number = 0; number < size; number += 2)
+    {
+        int *value = malloc (sizeof (int));
+        *value = number;
+        PVector_Insert (pVectorHandle, PVector_End (pVectorHandle), value);
+
+        if (CContainers_GetLastError () != 0)
+        {
+            printf ("        CContainers internal error code: %d.\n", CContainers_GetLastError ());
+            CU_FAIL_FATAL ("CContainers internal error!");
+        }
+    }
+
+    PVectorIterator iterator = PVector_Begin (pVectorHandle);
+    PVectorIterator nextIterator = PVectorIterator_Next (iterator);
+
+    while (iterator != PVector_End (pVectorHandle) && nextIterator != PVector_End (pVectorHandle))
+    {
+        int right = **((int **) PVectorIterator_ValueAt (nextIterator));
+        int left = **((int **) PVectorIterator_ValueAt (iterator));
+
+        if (right - left != 1)
+        {
+            int *value = malloc (sizeof (int));
+            *value = left + 1;
+            iterator = PVector_Insert (pVectorHandle, nextIterator, value);
+        }
+        else
+        {
+            iterator = PVectorIterator_Next (iterator);
+        }
+
+        nextIterator = PVectorIterator_Next (iterator);
+    }
+
+    PVectorSuite_Helper_CheckSize (size);
+    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
+    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (size);
+}
+
 void PVectorSuite_Setup ()
 {
     pVectorHandle = PVector_Create (INITIAL_CAPACITY);
@@ -84,81 +174,32 @@ void PVectorSuite_EmptyBeginEndIterator ()
 
 void PVectorSuite_InsertBackAndIterateInitialCapacity ()
 {
-    for (int number = 0; number < INITIAL_CAPACITY; ++number)
-    {
-        int *value = malloc (sizeof (int));
-        *value = number;
-        PVector_Insert (pVectorHandle, PVector_End (pVectorHandle), value);
-
-        if (CContainers_GetLastError () != 0)
-        {
-            printf ("        CContainers internal error code: %d.\n", CContainers_GetLastError ());
-            CU_FAIL_FATAL ("CContainers internal error!");
-        }
-    }
-
-    PVectorSuite_Helper_CheckSize (INITIAL_CAPACITY);
-    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
-    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (INITIAL_CAPACITY);
+    PVectorSuite_Helper_InsertBackAndIterate (INITIAL_CAPACITY);
 }
 
 void PVectorSuite_InsertBeginAndIterateInitialCapacity ()
 {
-    for (int number = INITIAL_CAPACITY - 1; number >= 0; --number)
-    {
-        int *value = malloc (sizeof (int));
-        *value = number;
-        PVector_Insert (pVectorHandle, PVector_Begin (pVectorHandle), value);
-
-        if (CContainers_GetLastError () != 0)
-        {
-            printf ("        CContainers internal error code: %d.\n", CContainers_GetLastError ());
-            CU_FAIL_FATAL ("CContainers internal error!");
-        }
-    }
-
-    PVectorSuite_Helper_CheckSize (INITIAL_CAPACITY);
-    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
-    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (INITIAL_CAPACITY);
+    PVectorSuite_Helper_InsertBeginAndIterate (INITIAL_CAPACITY);
 }
 
 void PVectorSuite_InsertMiddleAndIterateInitialCapacity ()
 {
-    for (int number = 0; number < INITIAL_CAPACITY; number += 2)
-    {
-        int *value = malloc (sizeof (int));
-        *value = number;
-        PVector_Insert (pVectorHandle, PVector_End (pVectorHandle), value);
+    PVectorSuite_Helper_InsertMiddleAndIterate (INITIAL_CAPACITY);
+}
 
-        if (CContainers_GetLastError () != 0)
-        {
-            printf ("        CContainers internal error code: %d.\n", CContainers_GetLastError ());
-            CU_FAIL_FATAL ("CContainers internal error!");
-        }
-    }
+void PVectorSuite_InsertBackAndIterateExtendedCapacity ()
+{
+    PVectorSuite_Helper_InsertBackAndIterate (INITIAL_CAPACITY * 2);
+}
 
-    PVectorIterator iterator = PVector_Begin (pVectorHandle);
-    PVectorIterator nextIterator = PVectorIterator_Next (iterator);
+void PVectorSuite_InsertBeginAndIterateExtendedCapacity ()
+{
+    PVectorSuite_Helper_InsertBeginAndIterate (INITIAL_CAPACITY * 2);
+}
 
-    while (iterator != PVector_End (pVectorHandle) && nextIterator != PVector_End (pVectorHandle))
-    {
-        int right = **((int **) PVectorIterator_ValueAt (nextIterator));
-        int left = **((int **) PVectorIterator_ValueAt (iterator));
-
-        if (right - left != 1)
-        {
-            int *value = malloc (sizeof (int));
-            *value = left + 1;
-            PVector_Insert (pVectorHandle, nextIterator, value);
-        }
-
-        iterator = PVectorIterator_Next (iterator);
-        nextIterator = PVectorIterator_Next (iterator);
-    }
-
-    PVectorSuite_Helper_CheckSize (INITIAL_CAPACITY);
-    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
-    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (INITIAL_CAPACITY);
+void PVectorSuite_InsertMiddleAndIterateExtendedCapacity ()
+{
+    PVectorSuite_Helper_InsertMiddleAndIterate (INITIAL_CAPACITY * 2);
 }
 
 void RegisterPVectorSuite ()
@@ -166,7 +207,12 @@ void RegisterPVectorSuite ()
     CU_CI_DEFINE_SUITE ("PVector", NULL, NULL, PVectorSuite_Setup, PVectorSuite_Teardown);
     CUNIT_CI_TEST (PVectorSuite_EmptyCreateFree);
     CUNIT_CI_TEST (PVectorSuite_EmptyBeginEndIterator);
+
     CUNIT_CI_TEST (PVectorSuite_InsertBackAndIterateInitialCapacity);
     CUNIT_CI_TEST (PVectorSuite_InsertBeginAndIterateInitialCapacity);
     CUNIT_CI_TEST (PVectorSuite_InsertMiddleAndIterateInitialCapacity);
+
+    CUNIT_CI_TEST (PVectorSuite_InsertBackAndIterateExtendedCapacity);
+    CUNIT_CI_TEST (PVectorSuite_InsertBeginAndIterateExtendedCapacity);
+    CUNIT_CI_TEST (PVectorSuite_InsertMiddleAndIterateExtendedCapacity);
 }
