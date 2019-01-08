@@ -122,6 +122,45 @@ void PVectorSuite_InsertBeginAndIterateInitialCapacity ()
     PVectorSuite_Helper_ItemAtCheckNaturalOrdered (INITIAL_CAPACITY);
 }
 
+void PVectorSuite_InsertMiddleAndIterateInitialCapacity ()
+{
+    for (int number = 0; number < INITIAL_CAPACITY; number += 2)
+    {
+        int *value = malloc (sizeof (int));
+        *value = number;
+        PVector_Insert (pVectorHandle, PVector_End (pVectorHandle), value);
+
+        if (CContainers_GetLastError () != 0)
+        {
+            printf ("        CContainers internal error code: %d.\n", CContainers_GetLastError ());
+            CU_FAIL_FATAL ("CContainers internal error!");
+        }
+    }
+
+    PVectorIterator iterator = PVector_Begin (pVectorHandle);
+    PVectorIterator nextIterator = PVectorIterator_Next (iterator);
+
+    while (iterator != PVector_End (pVectorHandle) && nextIterator != PVector_End (pVectorHandle))
+    {
+        int right = **((int **) PVectorIterator_ValueAt (nextIterator));
+        int left = **((int **) PVectorIterator_ValueAt (iterator));
+
+        if (right - left != 1)
+        {
+            int *value = malloc (sizeof (int));
+            *value = left + 1;
+            PVector_Insert (pVectorHandle, nextIterator, value);
+        }
+
+        iterator = PVectorIterator_Next (iterator);
+        nextIterator = PVectorIterator_Next (iterator);
+    }
+
+    PVectorSuite_Helper_CheckSize (INITIAL_CAPACITY);
+    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
+    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (INITIAL_CAPACITY);
+}
+
 void RegisterPVectorSuite ()
 {
     CU_CI_DEFINE_SUITE ("PVector", NULL, NULL, PVectorSuite_Setup, PVectorSuite_Teardown);
@@ -129,4 +168,5 @@ void RegisterPVectorSuite ()
     CUNIT_CI_TEST (PVectorSuite_EmptyBeginEndIterator);
     CUNIT_CI_TEST (PVectorSuite_InsertBackAndIterateInitialCapacity);
     CUNIT_CI_TEST (PVectorSuite_InsertBeginAndIterateInitialCapacity);
+    CUNIT_CI_TEST (PVectorSuite_InsertMiddleAndIterateInitialCapacity);
 }
