@@ -1,6 +1,8 @@
 #include "PVector.h"
 #include "Utils.h"
 #include "Errors.h"
+
+#include <ShortTypes.h>
 #include <stdlib.h>
 
 typedef struct
@@ -69,9 +71,11 @@ PVectorIterator PVector_Insert (PVectorHandle handle, PVectorIterator where, voi
     vector->size += 1;
     if (vector->size > vector->capacity)
     {
+        ulint index = where - PVector_Begin (handle);
         int increase = vector->capacity / 5;
         vector->capacity += increase > 0 ? increase : 1;
-        vector->buffer = realloc (vector->buffer, sizeof (void *) * vector->capacity);
+        vector->buffer = realloc (vector->buffer, sizeof (void **) * vector->capacity);
+        where = PVector_Begin (handle) + index;
     }
 
     PVectorIterator_ForEachReversed (PVectorIterator_Next (where),
