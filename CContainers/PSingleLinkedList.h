@@ -14,7 +14,8 @@ PSingleLinkedListIterator PSingleLinkedList_Begin (PSingleLinkedListHandle handl
 PSingleLinkedListIterator PSingleLinkedList_End (PSingleLinkedListHandle handle);
 PSingleLinkedListIterator PSingleLinkedList_At (PSingleLinkedListHandle handle, uint index);
 
-PSingleLinkedListIterator PSingleLinkedList_Insert (PSingleLinkedListHandle handle,
+void PSingleLinkedList_InsertFront (PSingleLinkedListHandle handle, void *value);
+PSingleLinkedListIterator PSingleLinkedList_InsertAfter (PSingleLinkedListHandle handle,
         PSingleLinkedListIterator where, void *value);
 PSingleLinkedListIterator PSingleLinkedList_Erase (PSingleLinkedListHandle handle,
         PSingleLinkedListIterator iterator);

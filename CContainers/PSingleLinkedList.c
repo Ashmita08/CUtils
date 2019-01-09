@@ -1,4 +1,6 @@
 #include "PSingleLinkedList.h"
+#include "Utils.h"
+#include "Errors.h"
 #include <stdlib.h>
 
 typedef struct
@@ -29,7 +31,7 @@ void PSingleLinkedList_Destruct (PSingleLinkedListHandle handle, void (*Destruct
     while (iterator != PSingleLinkedList_End (handle))
     {
         PSingleLinkedListNode *node = (PSingleLinkedListNode *) iterator;
-        DestructCallback (node->value);
+        DestructCallback (&node->value);
         iterator = PSingleLinkedListIterator_Next (iterator);
         free (node);
     }
@@ -54,6 +56,17 @@ PSingleLinkedListIterator PSingleLinkedList_End (PSingleLinkedListHandle handle)
     return NULL;
 }
 
+void PSingleLinkedList_InsertFront (PSingleLinkedListHandle handle, void *value)
+{
+    PSingleLinkedList *list = (PSingleLinkedList *) handle;
+    list->size += 1;
+
+    PSingleLinkedListNode *new = malloc (sizeof (PSingleLinkedListNode));
+    new->value = value;
+    new->next = list->head != NULL ? list->head : NULL;
+    list->head = new;
+}
+
 PSingleLinkedListIterator PSingleLinkedList_At (PSingleLinkedListHandle handle, uint index)
 {
     PSingleLinkedList *list = (PSingleLinkedList *) handle;
@@ -75,11 +88,26 @@ PSingleLinkedListIterator PSingleLinkedList_At (PSingleLinkedListHandle handle, 
     }
 }
 
-PSingleLinkedListIterator PSingleLinkedList_Insert (PSingleLinkedListHandle handle,
+PSingleLinkedListIterator PSingleLinkedList_InsertAfter (PSingleLinkedListHandle handle,
         PSingleLinkedListIterator where, void *value)
 {
     PSingleLinkedList *list = (PSingleLinkedList *) handle;
-    list->size -= 1;
+    list->size += 1;
+
+    if (list->head == NULL)
+    {
+        PSingleLinkedListNode *new = malloc (sizeof (PSingleLinkedListNode));
+        new->value = value;
+        new->next = NULL;
+        list->head = new;
+        return (PSingleLinkedListIterator) new;
+    }
+
+    if (where == PSingleLinkedList_End (handle))
+    {
+        CContainers_SetLastError (PSINGLELINKEDLIST_ERROR_INCORRECT_ITERATOR);
+        return NULL;
+    }
 
     PSingleLinkedListNode *previousNode = (PSingleLinkedListNode *) where;
     PSingleLinkedListNode *next = (PSingleLinkedListNode *) previousNode->next;
@@ -88,6 +116,7 @@ PSingleLinkedListIterator PSingleLinkedList_Insert (PSingleLinkedListHandle hand
     new->value = value;
     new->next = next;
     previousNode->next = new;
+    return (PSingleLinkedListIterator) new;
 }
 
 PSingleLinkedListIterator PSingleLinkedList_Erase (PSingleLinkedListHandle handle,
@@ -157,7 +186,7 @@ void PSingleLinkedListIterator_ForEach (PSingleLinkedListIterator begin, PSingle
     while (begin != end)
     {
         PSingleLinkedListNode *node = (PSingleLinkedListNode *) begin;
-        Callback (node->value);
+        Callback (&(node->value));
         begin = PSingleLinkedListIterator_Next (begin);
     }
 }
