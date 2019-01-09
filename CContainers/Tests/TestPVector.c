@@ -15,7 +15,7 @@ void PVectorSuite_Helper_CheckSize (uint size)
     if (size != PVector_Size (pVectorHandle))
     {
         printf ("\n        Size (e/a): %d, %d.", size, PVector_Size (pVectorHandle));
-        CU_FAIL_FATAL ("Expected and equal values are not equal!");
+        CU_FAIL_FATAL ("Expected and actual values are not equal!");
     }
 }
 
