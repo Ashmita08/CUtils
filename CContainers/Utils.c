@@ -15,5 +15,5 @@ void CContainers_SetLastError (uint lastError)
 
 void ContainerCallback_Free (void **item)
 {
-    free (item);
+    free (*item);
 }
