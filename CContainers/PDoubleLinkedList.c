@@ -25,7 +25,7 @@ PDoubleLinkedListHandle PDoubleLinkedList_Create ()
     PDoubleLinkedListNode *endMarker = malloc (sizeof (PDoubleLinkedListNode));
     endMarker->value = NULL;
     endMarker->next = NULL;
-    endMarker->next = NULL;
+    endMarker->previous = NULL;
 
     list->head = endMarker;
     list->tail = endMarker;
@@ -40,6 +40,7 @@ void PDoubleLinkedList_Destruct (PDoubleLinkedListHandle handle, void (*Destruct
     while (node != NULL)
     {
         PDoubleLinkedListNode *next = (PDoubleLinkedListNode *) node->next;
+        DestructCallback (&(node->value));
         free (node);
         node = next;
     }
