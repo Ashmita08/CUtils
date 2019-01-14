@@ -8,7 +8,7 @@
 #include <CContainers/Utils.h>
 
 #define TEST_LIST_SIZE 10
-PSingleLinkedListHandle pSingleLinkedListHandle;
+static PSingleLinkedListHandle pSingleLinkedListHandle;
 
 void PSingleLinkedListSuite_Helper_CheckSize (uint size)
 {
@@ -19,7 +19,7 @@ void PSingleLinkedListSuite_Helper_CheckSize (uint size)
     }
 }
 
-int CheckIterationOrderCallback_number = 0;
+static int CheckIterationOrderCallback_number = 0;
 
 void CheckIterationOrderCallback (void **item)
 {
