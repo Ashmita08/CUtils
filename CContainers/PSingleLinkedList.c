@@ -72,20 +72,17 @@ PSingleLinkedListIterator PSingleLinkedList_At (PSingleLinkedListHandle handle, 
     PSingleLinkedList *list = (PSingleLinkedList *) handle;
     PSingleLinkedListIterator iterator = PSingleLinkedList_Begin (handle);
 
-    while (iterator != PSingleLinkedList_End (handle) && index != 0)
-    {
-        iterator = PSingleLinkedListIterator_Next (iterator);
-        --index;
-    }
-
-    if (index == 0)
-    {
-        return iterator;
-    }
-    else
+    if (index >= list->size)
     {
         return NULL;
     }
+
+    while (index--)
+    {
+        iterator = PSingleLinkedListIterator_Next (iterator);
+    }
+
+    return iterator;
 }
 
 PSingleLinkedListIterator PSingleLinkedList_InsertAfter (PSingleLinkedListHandle handle,
