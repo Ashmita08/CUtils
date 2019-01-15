@@ -75,7 +75,7 @@ static void PVectorHeap_SiftUp (PVectorHeap *heap, uint elementIndex)
     void **current = PVectorIterator_ValueAt (PVector_At (heap->vector, elementIndex));
     void **parent = PVectorIterator_ValueAt (PVector_At (heap->vector, parentIndex));
 
-    if (heap->Comparator (current, parent) > 0)
+    if (heap->Comparator (*current, *parent) > 0)
     {
         void *temp = *current;
         *current = *parent;
@@ -126,7 +126,7 @@ const void *PVectorHeap_Top (PVectorHeapHandle handle)
     if (PVectorHeap_Size (handle) > 0)
     {
         PVectorHeap *heap = (PVectorHeap *) handle;
-        return PVectorIterator_ValueAt (PVector_Begin (heap->vector));
+        return *PVectorIterator_ValueAt (PVector_Begin (heap->vector));
     }
     else
     {
