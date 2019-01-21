@@ -80,8 +80,11 @@ PVectorIterator PVector_Insert (PVectorHandle handle, PVectorIterator where, voi
         where = PVector_Begin (handle) + index;
     }
 
-    PVectorIterator_ForEachReversed (PVectorIterator_Next (where),
-            PVectorIterator_Previous (PVector_End (handle)), PVectorCallback_MoveRight);
+    if (where < PVectorIterator_Previous (PVector_End (handle)))
+    {
+        PVectorIterator_ForEachReversed (PVectorIterator_Next (where),
+                PVectorIterator_Previous (PVector_End (handle)), PVectorCallback_MoveRight);
+    }
     
     *PVectorIterator_ValueAt (where) = value;
     return where;
