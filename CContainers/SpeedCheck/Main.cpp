@@ -1,5 +1,5 @@
 #include "PVector_vs_stdvector.hpp"
-#include "PHashMap_vs_stdunorderedmap.h"
+#include "PHashMap_vs_stdunorderedmap.hpp"
 
 int main ()
 {
