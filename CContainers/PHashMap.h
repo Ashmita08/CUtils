@@ -13,6 +13,7 @@ uint PHashMap_Size (PHashMapHandle handle);
 char PHashMap_ContainsKey (PHashMapHandle handle, void *key);
 char PHashMap_Insert (PHashMapHandle handle, void *key, void *value);
 void **PHashMap_GetValue (PHashMapHandle handle, void *key);
-char PHashMap_Erase (PHashMapHandle handle, void *key, void (*ValueDestructCallback) (void **value));
+char PHashMap_Erase (PHashMapHandle handle, void *key, void (*KeyDestructCallback) (void **key),
+        void (*ValueDestructCallback) (void **value));
 
 #endif // __CUTILS_CCONTAINERS_PHASHMAP_H__

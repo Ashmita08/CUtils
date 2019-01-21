@@ -163,7 +163,7 @@ uint PHashMap_Size (PHashMapHandle handle)
 char PHashMap_ContainsKey (PHashMapHandle handle, void *key)
 {
     PHashMap *hashMap = (PHashMap *) handle;
-    return PHashMap_GetPair (hashMap, key) == NULL;
+    return PHashMap_GetPair (hashMap, key) != NULL;
 }
 
 char PHashMap_Insert (PHashMapHandle handle, void *key, void *value)
@@ -198,7 +198,8 @@ void **PHashMap_GetValue (PHashMapHandle handle, void *key)
     return pair != NULL ? &(pair->value) : NULL;
 }
 
-char PHashMap_Erase (PHashMapHandle handle, void *key, void (*ValueDestructCallback) (void **value))
+char PHashMap_Erase (PHashMapHandle handle, void *key, void (*KeyDestructCallback) (void **key),
+        void (*ValueDestructCallback) (void **value))
 {
     PHashMap *hashMap = (PHashMap *) handle;
     PVectorHandle bucket = PHashMap_GetBucket (hashMap, key);
@@ -213,7 +214,9 @@ char PHashMap_Erase (PHashMapHandle handle, void *key, void (*ValueDestructCallb
         hashMap->size -= 1;
         KeyValuePair *pair = *PVectorIterator_ValueAt (iterator);;
 
+        KeyDestructCallback (&(pair->key));
         ValueDestructCallback (&(pair->value));
+
         PVector_Erase (bucket, iterator);
         free (pair);
         return 1;
