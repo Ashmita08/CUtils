@@ -9,12 +9,12 @@
 
 typedef struct
 {
-    uint capacity;
-    uint size;
+    ulint capacity;
+    ulint size;
     void **buffer;
 } PVector;
 
-PVectorHandle PVector_Create (uint initialCapacity)
+PVectorHandle PVector_Create (ulint initialCapacity)
 {
     PVector *vector = malloc (sizeof (PVector));
     vector->capacity = initialCapacity;
@@ -31,7 +31,7 @@ void PVector_Destruct (PVectorHandle handle, void (*DestructCallback) (void **it
     free (vector);
 }
 
-uint PVector_Size (PVectorHandle handle)
+ulint PVector_Size (PVectorHandle handle)
 {
     PVector *vector = (PVector *) handle;
     return vector->size;
@@ -49,7 +49,7 @@ PVectorIterator PVector_End (PVectorHandle handle)
     return (PVectorIterator) (vector->buffer + vector->size);
 }
 
-PVectorIterator PVector_At (PVectorHandle handle, uint index)
+PVectorIterator PVector_At (PVectorHandle handle, ulint index)
 {
     PVector *vector = (PVector *) handle;
     if (index >= vector->size)

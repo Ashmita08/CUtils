@@ -6,13 +6,13 @@
 typedef void *PVectorHandle;
 typedef void **PVectorIterator;
 
-PVectorHandle PVector_Create (uint initialCapacity);
+PVectorHandle PVector_Create (ulint initialCapacity);
 void PVector_Destruct (PVectorHandle handle, void (*DestructCallback) (void **item));
-uint PVector_Size (PVectorHandle handle);
+ulint PVector_Size (PVectorHandle handle);
 
 PVectorIterator PVector_Begin (PVectorHandle handle);
 PVectorIterator PVector_End (PVectorHandle handle);
-PVectorIterator PVector_At (PVectorHandle handle, uint index);
+PVectorIterator PVector_At (PVectorHandle handle, ulint index);
 
 PVectorIterator PVector_Insert (PVectorHandle handle, PVectorIterator where, void *value);
 PVectorIterator PVector_Erase (PVectorHandle handle, PVectorIterator iterator);
