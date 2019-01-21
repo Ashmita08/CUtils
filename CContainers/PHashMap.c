@@ -129,7 +129,7 @@ PHashMapHandle PHashMap_Create (uint initialBucketCount, uint maxBucketLoad,
     return (PHashMapHandle) hashMap;
 }
 
-void PHashMap_Destroy (PHashMapHandle handle, void (*KeyDestructCallback) (void **key),
+void PHashMap_Destruct (PHashMapHandle handle, void (*KeyDestructCallback) (void **key),
         void (*ValueDestructCallback) (void **value))
 {
     PHashMap *hashMap = (PHashMap *) handle;

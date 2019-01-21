@@ -106,7 +106,7 @@ static void PHashMapSuite_Setup ()
 
 static void PHashMapSuite_Teardown ()
 {
-    PHashMap_Destroy (pHashMapHandle, ContainerCallback_Free, ContainerCallback_Free);
+    PHashMap_Destruct (pHashMapHandle, ContainerCallback_Free, ContainerCallback_Free);
 }
 
 static void PHashMapSuite_ContainsNoRebucketing ()

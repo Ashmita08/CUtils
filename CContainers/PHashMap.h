@@ -6,7 +6,7 @@
 typedef void *PHashMapHandle;
 PHashMapHandle PHashMap_Create (uint initialBucketCount, uint maxBucketLoad,
         uint (*HashKey) (void *key), int (*KeyCompare) (void *first, void *second));
-void PHashMap_Destroy (PHashMapHandle handle, void (*KeyDestructCallback) (void **key),
+void PHashMap_Destruct (PHashMapHandle handle, void (*KeyDestructCallback) (void **key),
         void (*ValueDestructCallback) (void **value));
 
 uint PHashMap_Size (PHashMapHandle handle);
