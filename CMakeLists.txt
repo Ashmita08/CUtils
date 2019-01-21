@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.0)
-project (CUtils C)
+project (CUtils C CXX)
 enable_testing ()
 
 set (CMAKE_C_STANDARD 11)

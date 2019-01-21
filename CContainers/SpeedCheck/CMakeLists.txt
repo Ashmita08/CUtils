@@ -1,0 +1,2 @@
+add_executable (CContainersSpeedCheck Main.cpp PVector_vs_stdvector.cpp PVector_vs_stdvector.hpp)
+target_link_libraries (CContainersSpeedCheck CContainers)
