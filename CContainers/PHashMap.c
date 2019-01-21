@@ -56,7 +56,7 @@ static PVectorHandle PHashMap_GetBucket (PHashMap *hashMap, void *key)
     return *PVectorIterator_ValueAt (PVector_At (hashMap->buckets, bucketIndex));
 }
 
-static KeyValuePair *PHashMap_GetPairInBucket (PHashMap *hashMap, PVectorHandle bucket, void *key)
+static PVectorIterator PHashMap_GetPairIteratorInBucket (PHashMap *hashMap, PVectorHandle bucket, void *key)
 {
     PVectorIterator keyValueIterator = PVector_Begin (bucket);
     while (keyValueIterator != PVector_End (bucket))
@@ -64,13 +64,26 @@ static KeyValuePair *PHashMap_GetPairInBucket (PHashMap *hashMap, PVectorHandle 
         KeyValuePair *pair = *PVectorIterator_ValueAt (keyValueIterator);
         if (hashMap->KeyComparator (key, pair->key) == 0)
         {
-            return pair;
+            return keyValueIterator;
         }
 
         keyValueIterator = PVectorIterator_Next (keyValueIterator);
     }
 
-    return NULL;
+    return PVector_End (bucket);
+}
+
+static KeyValuePair *PHashMap_GetPairInBucket (PHashMap *hashMap, PVectorHandle bucket, void *key)
+{
+    PVectorIterator keyValueIterator = PHashMap_GetPairIteratorInBucket (hashMap, bucket, key);
+    if (keyValueIterator != PVector_End (bucket))
+    {
+        return *PVectorIterator_ValueAt (keyValueIterator);
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 static KeyValuePair *PHashMap_GetPair (PHashMap *hashMap, void *key)
@@ -167,6 +180,7 @@ char PHashMap_Insert (PHashMapHandle handle, void *key, void *value)
     pair = malloc (sizeof (KeyValuePair));
     pair->key = key;
     pair->value = value;
+    hashMap->size += 1;
     PVector_Insert (bucket, PVector_End (bucket), pair);
 
     if (PVector_Size (bucket) > hashMap->maxLoad)
@@ -182,4 +196,26 @@ void **PHashMap_GetValue (PHashMapHandle handle, void *key)
     PHashMap *hashMap = (PHashMap *) handle;
     KeyValuePair *pair = PHashMap_GetPair (hashMap, key);
     return pair != NULL ? &(pair->value) : NULL;
+}
+
+char PHashMap_Erase (PHashMapHandle handle, void *key, void (*ValueDestructCallback) (void **value))
+{
+    PHashMap *hashMap = (PHashMap *) handle;
+    PVectorHandle bucket = PHashMap_GetBucket (hashMap, key);
+    PVectorIterator iterator = PHashMap_GetPairIteratorInBucket (hashMap, bucket, key);
+
+    if (iterator == PVector_End (bucket))
+    {
+        return 0;
+    }
+    else
+    {
+        hashMap->size -= 1;
+        KeyValuePair *pair = *PVectorIterator_ValueAt (iterator);;
+
+        ValueDestructCallback (&(pair->value));
+        PVector_Erase (bucket, iterator);
+        free (pair);
+        return 1;
+    }
 }
