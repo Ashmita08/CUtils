@@ -3,6 +3,18 @@
 #include "Errors.h"
 #include <stdlib.h>
 
+ISizedContainer PVectorHeap_ISizedContainer =
+        {
+            PVectorHeap_Size
+        };
+
+IOrganizerContainer PVectorHeap_IOrganizerContainer =
+        {
+            PVectorHeap_Push,
+            PVectorHeap_Top,
+            PVectorHeap_Pop
+        };
+
 typedef struct
 {
     PVectorHandle vector;
@@ -115,7 +127,7 @@ void PVectorHeap_Destruct (PVectorHeapHandle handle, void (*DestructCallback) (v
     free (heap);
 }
 
-uint PVectorHeap_Size (PVectorHeapHandle handle)
+ulint PVectorHeap_Size (PVectorHeapHandle handle)
 {
     PVectorHeap *heap = (PVectorHeap *) handle;
     return PVector_Size (heap->vector);
@@ -152,4 +164,14 @@ void PVectorHeap_Push (PVectorHeapHandle handle, void *value)
     PVectorHeap *heap = (PVectorHeap *) handle;
     PVector_Insert (heap->vector, PVector_End (heap->vector), value);
     PVectorHeap_SiftUp (heap, PVector_Size (heap->vector) - 1);
+}
+
+ISizedContainer *PVectorHeap_AsISizedContainer ()
+{
+    return &PVectorHeap_ISizedContainer;
+}
+
+IOrganizerContainer *PVectorHeap_AsIOrganizerContainer ()
+{
+    return &PVectorHeap_IOrganizerContainer;
 }
