@@ -3,7 +3,7 @@ project (CUtils C CXX)
 enable_testing ()
 
 set (CMAKE_C_STANDARD 11)
-set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CUNIT_SDK}/share/cmake/cunit;${CUNIT_SDK}/share/cmake")
+set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CUNIT_SDK}/share/cmake/cunit;${CUNIT_SDK}CUnit/share/cmake")
 
 find_package (CUnit REQUIRED)
 find_package (CUnitHeaders MODULE REQUIRED)
