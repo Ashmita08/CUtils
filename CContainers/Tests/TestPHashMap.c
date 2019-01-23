@@ -19,7 +19,7 @@ ulint HashKey (void *key)
 
 lint KeyCompare (void *first, void *second)
 {
-    return *(lint *) first - *(lint *) second;
+    return *(int *) first - *(int *) second;
 }
 
 static void PHashMapSuite_Helper_CheckSize (uint size)
