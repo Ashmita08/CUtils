@@ -8,5 +8,5 @@ before_script:
 
 script:
   - echo $CUNIT_SDK
-  - mkdir build && cd build && cmake .. -DCMAKE_PREFIX_PATH="$CUNIT_SDK/CUnit/share/cmake" && cmake --build . --target all && ctest
+  - mkdir build && cd build && cmake .. -DCMAKE_PREFIX_PATH="$CUNIT_SDK/CUnit/share/cmake" -DCUNIT_SDK="$CUNIT_SDK" && cmake --build . --target all && ctest
   - echo "Testing log:" && cat "Testing/Temporary/LastTest.log"
