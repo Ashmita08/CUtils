@@ -4,8 +4,8 @@ compiler:
   - clang
 
 before_script:
-  - git clone https://gitlab.com/cunity/cunit.git && cd cunit && mkdir build && cd build && cmake .. && cmake --build . --target install
+  - git clone https://gitlab.com/cunity/cunit.git && cd cunit && mkdir build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=SDK && cmake --build . --target install && export CUNIT_SDK=$PWD/SDK
 
 script:
-  - mkdir build && cd build && cmake .. && cmake --build . --target all && ctest
+  - mkdir build && cd build && cmake .. -DCUNIT_SDK=$CUNIT_SDK && cmake --build . --target all && ctest
   - echo "Testing log:" && cat "Testing/Temporary/LastTest.log"
