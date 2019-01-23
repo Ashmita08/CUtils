@@ -14,7 +14,7 @@ PHashMapHandle pHashMapHandle;
 
 ulint HashKey (void *key)
 {
-    return *(ulint *) key;
+    return (ulint) *(int *) key;
 }
 
 lint KeyCompare (void *first, void *second)
