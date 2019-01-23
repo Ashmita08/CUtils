@@ -3,6 +3,37 @@
 #include "Errors.h"
 #include <stdlib.h>
 
+IOneDirectionIterator PDoubleLinkedListIterator_IOneDirectionIterator =
+        {
+                PDoubleLinkedListIterator_Next,
+                PDoubleLinkedListIterator_ValueAt
+        };
+
+IBiDirectionalIterator PDoubleLinkedListIterator_IBiDirectionalIterator =
+        {
+                PDoubleLinkedListIterator_Next,
+                PDoubleLinkedListIterator_Previous,
+                PDoubleLinkedListIterator_ValueAt
+        };
+
+ISizedContainer PDoubleLinkedList_ISizedContainer =
+        {
+                PDoubleLinkedList_Size
+        };
+
+IIterableContainer PDoubleLinkedList_IIterableContainer =
+        {
+                PDoubleLinkedList_Begin,
+                PDoubleLinkedList_End,
+                PDoubleLinkedList_At
+        };
+
+IMutableContainer PDoubleLinkedList_IMutableContainer =
+        {
+                PDoubleLinkedList_Insert,
+                PDoubleLinkedList_Erase
+        };
+
 typedef struct
 {
     void *value;
@@ -12,7 +43,7 @@ typedef struct
 
 typedef struct
 {
-    uint size;
+    ulint size;
     PDoubleLinkedListNode *head;
     PDoubleLinkedListNode *tail;
 } PDoubleLinkedList;
@@ -48,7 +79,7 @@ void PDoubleLinkedList_Destruct (PDoubleLinkedListHandle handle, void (*Destruct
     free (list);
 }
 
-uint PDoubleLinkedList_Size (PDoubleLinkedListHandle handle)
+ulint PDoubleLinkedList_Size (PDoubleLinkedListHandle handle)
 {
     PDoubleLinkedList *list = (PDoubleLinkedList *) handle;
     return list->size;
@@ -66,7 +97,7 @@ PDoubleLinkedListIterator PDoubleLinkedList_End (PDoubleLinkedListHandle handle)
     return list->tail;
 }
 
-PDoubleLinkedListIterator PDoubleLinkedList_At (PDoubleLinkedListHandle handle, uint index)
+PDoubleLinkedListIterator PDoubleLinkedList_At (PDoubleLinkedListHandle handle, ulint index)
 {
     PDoubleLinkedList *list = (PDoubleLinkedList *) handle;
     if (index >= list->size)
@@ -176,4 +207,29 @@ void PDoubleLinkedListIterator_ForEachReversed (PDoubleLinkedListIterator begin,
         Callback (PDoubleLinkedListIterator_ValueAt (last));
         last = PDoubleLinkedListIterator_Previous (last);
     } while (begin != last);
+}
+
+IOneDirectionIterator *PDoubleLinkedListIterator_AsIOneDirectionIterator ()
+{
+    return &PDoubleLinkedListIterator_IOneDirectionIterator;
+}
+
+IBiDirectionalIterator *PDoubleLinkedListIterator_AsIBiDirectionalIterator ()
+{
+    return &PDoubleLinkedListIterator_IBiDirectionalIterator;
+}
+
+ISizedContainer *PDoubleLinkedList_AsISizedContainer ()
+{
+    return &PDoubleLinkedList_ISizedContainer;
+}
+
+IIterableContainer *PDoubleLinkedList_AsIIterableContainer ()
+{
+    return &PDoubleLinkedList_IIterableContainer;
+}
+
+IMutableContainer *PDoubleLinkedList_AsIMutableContainer ()
+{
+    return &PDoubleLinkedList_IMutableContainer;
 }
