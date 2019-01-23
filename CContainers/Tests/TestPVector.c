@@ -1,8 +1,8 @@
 #include "TestPVector.h"
 #include <stdlib.h>
 
-#include <cunit/CUnit.h>
-#include <cunit/CUnitCI.h>
+#include <CUnit/CUnit.h>
+#include <CUnit/CUnitCI.h>
 
 #include <CContainers/PVector.h>
 #include <CContainers/Utils.h>
