@@ -105,7 +105,7 @@ PVectorHeapHandle PVectorHeap_Create (uint initialCapacity, lint (*Comparator) (
 }
 
 PVectorHeapHandle PVectorHeap_Heapify (PVectorHandle vectorHandle,
-        int (*Comparator) (const void *first, const void *second))
+        lint (*Comparator) (const void *first, const void *second))
 {
     PVectorHeap *heap = malloc (sizeof (PVectorHeap));
     heap->vector = vectorHandle;
