@@ -14,14 +14,14 @@ extern "C"
 #define PHASHMAP_MAXBUCKETLOAD 10
 #define PHASHMAP_DEFAULT_BUCKET_COUNT 100
 
-static uint HashKey (void *key)
+static ulint HashKey (void *key)
 {
-    return (uint) key;
+    return (ulint) key;
 }
 
-static int KeyCompare (void *first, void *second)
+static lint KeyCompare (void *first, void *second)
 {
-    return (int) first - (int) second;
+    return (lint) first - (lint) second;
 }
 
 static void EmptyDestruct (void **item)

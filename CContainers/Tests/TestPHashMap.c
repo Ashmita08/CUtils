@@ -12,14 +12,14 @@
 
 PHashMapHandle pHashMapHandle;
 
-uint HashKey (void *key)
+ulint HashKey (void *key)
 {
-    return *(uint *) key;
+    return *(ulint *) key;
 }
 
-int KeyCompare (void *first, void *second)
+lint KeyCompare (void *first, void *second)
 {
-    return *(int *) first - *(int *) second;
+    return *(lint *) first - *(lint *) second;
 }
 
 static void PHashMapSuite_Helper_CheckSize (uint size)

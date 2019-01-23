@@ -6,6 +6,19 @@
 
 #define BUCKET_COUNT_INCREASE_FACTOR 1.5
 
+ISizedContainer PHashMap_ISizedContainer =
+        {
+            PHashMap_Size
+        };
+
+IMapContainer PHashMap_IMapContainer =
+        {
+            PHashMap_ContainsKey,
+            PHashMap_Insert,
+            PHashMap_GetValue,
+            PHashMap_Erase
+        };
+
 typedef struct
 {
     void *key;
@@ -14,13 +27,13 @@ typedef struct
 
 typedef struct
 {
-    uint size;
-    uint maxLoad;
+    ulint size;
+    ulint maxLoad;
     /// Vector of vector handles, each inner vector is key-value pair.
     PVectorHandle buckets;
 
-    uint (*HashFunction) (void *key);
-    int (*KeyComparator) (void *first, void *second);
+    ulint (*HashFunction) (void *key);
+    lint (*KeyComparator) (void *first, void *second);
 } PHashMap;
 
 static void EmptyDeleteCallback (void **item)
@@ -38,7 +51,7 @@ static void PHashMap_BucketDestroyCallback (void **bucket)
     PVector_Destruct (*bucket, ContainerCallback_Free);
 }
 
-static void PHashMap_InitBuckets (PHashMap *hashMap, uint bucketsCount)
+static void PHashMap_InitBuckets (PHashMap *hashMap, ulint bucketsCount)
 {
     PVectorHandle buckets = PVector_Create (bucketsCount);
     while (bucketsCount--)
@@ -52,7 +65,7 @@ static void PHashMap_InitBuckets (PHashMap *hashMap, uint bucketsCount)
 
 static PVectorHandle PHashMap_GetBucket (PHashMap *hashMap, void *key)
 {
-    uint bucketIndex = hashMap->HashFunction (key) % PVector_Size (hashMap->buckets);
+    ulint bucketIndex = hashMap->HashFunction (key) % PVector_Size (hashMap->buckets);
     return *PVectorIterator_ValueAt (PVector_At (hashMap->buckets, bucketIndex));
 }
 
@@ -94,7 +107,7 @@ static KeyValuePair *PHashMap_GetPair (PHashMap *hashMap, void *key)
 static void PHashMap_Rehash (PHashMap *hashMap)
 {
     PVectorHandle oldBuckets = hashMap->buckets;
-    PHashMap_InitBuckets (hashMap, (uint) (PVector_Size (oldBuckets) * BUCKET_COUNT_INCREASE_FACTOR));
+    PHashMap_InitBuckets (hashMap, (ulint) (PVector_Size (oldBuckets) * BUCKET_COUNT_INCREASE_FACTOR));
     PVectorIterator bucketIterator = PVector_Begin (oldBuckets);
 
     while (bucketIterator != PVector_End (oldBuckets))
@@ -116,8 +129,8 @@ static void PHashMap_Rehash (PHashMap *hashMap)
     PVector_Destruct (oldBuckets, PHashMap_BucketDestroyCallbackKeepPairs);
 }
 
-PHashMapHandle PHashMap_Create (uint initialBucketCount, uint maxBucketLoad,
-        uint (*HashKey) (void *key), int (*KeyCompare) (void *first, void *second))
+PHashMapHandle PHashMap_Create (ulint initialBucketCount, ulint maxBucketLoad,
+        ulint (*HashKey) (void *key), lint (*KeyCompare) (void *first, void *second))
 {
     PHashMap *hashMap = malloc (sizeof (PHashMap));
     hashMap->size = 0;
@@ -154,7 +167,7 @@ void PHashMap_Destruct (PHashMapHandle handle, void (*KeyDestructCallback) (void
     PVector_Destruct (hashMap->buckets, PHashMap_BucketDestroyCallback);
 }
 
-uint PHashMap_Size (PHashMapHandle handle)
+ulint PHashMap_Size (PHashMapHandle handle)
 {
     PHashMap *hashMap = (PHashMap *) handle;
     return hashMap->size;
@@ -221,4 +234,14 @@ char PHashMap_Erase (PHashMapHandle handle, void *key, void (*KeyDestructCallbac
         free (pair);
         return 1;
     }
+}
+
+ISizedContainer *PHashMap_AsISizedContainer ()
+{
+    return &PHashMap_ISizedContainer;
+}
+
+IMapContainer *PHashMap_AsIMapContainer ()
+{
+    return &PHashMap_IMapContainer;
 }
