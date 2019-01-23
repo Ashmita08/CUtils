@@ -3,6 +3,41 @@
 #include "Errors.h"
 #include <stdlib.h>
 
+IOneDirectionIterator PSingleLinkedListIterator_IOneDirectionIterator =
+        {
+            PSingleLinkedListIterator_Next,
+            PSingleLinkedListIterator_ValueAt
+        };
+
+ISizedContainer PSingleLinkedList_IISizedContainer =
+        {
+                PSingleLinkedList_Size
+        };
+
+IIterableContainer PSingleLinkedList_IIterableContainer =
+        {
+            PSingleLinkedList_Begin,
+            PSingleLinkedList_End,
+            PSingleLinkedList_At
+        };
+
+static const void *PSingleLinkedList_TopAdapter (PSingleLinkedListHandle handle)
+{
+    return PSingleLinkedListIterator_ValueAt (PSingleLinkedList_Begin (handle));
+}
+
+static void PSingleLinkedList_PopAdapter (PSingleLinkedListHandle handle)
+{
+    PSingleLinkedList_Erase (handle, PSingleLinkedList_Begin (handle));
+}
+
+IOrganizerContainer PSingleLinkedList_IOrganizerContainer =
+        {
+                PSingleLinkedList_InsertFront,
+                PSingleLinkedList_TopAdapter,
+                PSingleLinkedList_PopAdapter
+        };
+
 typedef struct
 {
     void *value;
@@ -11,7 +46,7 @@ typedef struct
 
 typedef struct
 {
-    uint size;
+    ulint size;
     PSingleLinkedListNode *head;
 } PSingleLinkedList;
 
@@ -39,7 +74,7 @@ void PSingleLinkedList_Destruct (PSingleLinkedListHandle handle, void (*Destruct
     free (list);
 }
 
-uint PSingleLinkedList_Size (PSingleLinkedListHandle handle)
+ulint PSingleLinkedList_Size (PSingleLinkedListHandle handle)
 {
     PSingleLinkedList *list = (PSingleLinkedList *) handle;
     return list->size;
@@ -67,7 +102,7 @@ void PSingleLinkedList_InsertFront (PSingleLinkedListHandle handle, void *value)
     list->head = new;
 }
 
-PSingleLinkedListIterator PSingleLinkedList_At (PSingleLinkedListHandle handle, uint index)
+PSingleLinkedListIterator PSingleLinkedList_At (PSingleLinkedListHandle handle, ulint index)
 {
     PSingleLinkedList *list = (PSingleLinkedList *) handle;
     PSingleLinkedListIterator iterator = PSingleLinkedList_Begin (handle);
@@ -186,4 +221,24 @@ void PSingleLinkedListIterator_ForEach (PSingleLinkedListIterator begin, PSingle
         Callback (&(node->value));
         begin = PSingleLinkedListIterator_Next (begin);
     }
+}
+
+IOneDirectionIterator *PSingleLinkedListIterator_AsIOneDirectionIterator ()
+{
+    return &PSingleLinkedListIterator_IOneDirectionIterator;
+}
+
+ISizedContainer *PSingleLinkedList_AsIISizedContaine ()
+{
+    return &PSingleLinkedList_IISizedContainer;
+}
+
+IIterableContainer *PSingleLinkedList_AsIIterableContainer ()
+{
+    return &PSingleLinkedList_IIterableContainer;
+}
+
+IOrganizerContainer *PSingleLinkedList_AsIOrganizerContainer ()
+{
+    return &PSingleLinkedList_IOrganizerContainer;
 }

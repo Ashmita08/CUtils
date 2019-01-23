@@ -2,17 +2,18 @@
 #define __CUTILS_CCONTAINERS_PSINGLELINKEDLIST_H__
 
 #include <ShortTypes.h>
+#include "Interfaces.h"
 
 typedef void *PSingleLinkedListHandle;
 typedef void *PSingleLinkedListIterator;
 
 PSingleLinkedListHandle PSingleLinkedList_Create ();
 void PSingleLinkedList_Destruct (PSingleLinkedListHandle handle, void (*DestructCallback) (void **item));
-uint PSingleLinkedList_Size (PSingleLinkedListHandle handle);
+ulint PSingleLinkedList_Size (PSingleLinkedListHandle handle);
 
 PSingleLinkedListIterator PSingleLinkedList_Begin (PSingleLinkedListHandle handle);
 PSingleLinkedListIterator PSingleLinkedList_End (PSingleLinkedListHandle handle);
-PSingleLinkedListIterator PSingleLinkedList_At (PSingleLinkedListHandle handle, uint index);
+PSingleLinkedListIterator PSingleLinkedList_At (PSingleLinkedListHandle handle, ulint index);
 
 void PSingleLinkedList_InsertFront (PSingleLinkedListHandle handle, void *value);
 PSingleLinkedListIterator PSingleLinkedList_InsertAfter (PSingleLinkedListHandle handle,
@@ -26,5 +27,10 @@ PSingleLinkedListIterator PSingleLinkedListIterator_Next (PSingleLinkedListItera
 void **PSingleLinkedListIterator_ValueAt (PSingleLinkedListIterator iterator);
 void PSingleLinkedListIterator_ForEach (PSingleLinkedListIterator begin, PSingleLinkedListIterator end,
         void (*Callback) (void **item));
+
+IOneDirectionIterator *PSingleLinkedListIterator_AsIOneDirectionIterator ();
+ISizedContainer *PSingleLinkedList_AsIISizedContaine ();
+IIterableContainer *PSingleLinkedList_AsIIterableContainer ();
+IOrganizerContainer *PSingleLinkedList_AsIOrganizerContainer ();
 
 #endif // __CUTILS_CCONTAINERS_PSINGLELINKEDLIST_H__
