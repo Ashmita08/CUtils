@@ -7,6 +7,37 @@
 
 #define BUFFER_INCREASE_MODIFIER 1
 
+IOneDirectionIterator PVectorIterator_IOneDirectionIterator =
+        {
+            PVectorIterator_Next,
+            PVectorIterator_ValueAt
+        };
+
+IBiDirectionalIterator PVectorIterator_IBiDirectionalIterator =
+        {
+                PVectorIterator_Next,
+                PVectorIterator_Previous,
+                PVectorIterator_ValueAt
+        };
+
+ISizedContainer PVector_ISizedContainer =
+        {
+            PVector_Size
+        };
+
+IIterableContainer PVector_IIterableContainer =
+        {
+            PVector_Begin,
+            PVector_End,
+            PVector_At
+        };
+
+IMutableContainer PVector_IMutableContainer =
+        {
+            PVector_Insert,
+            PVector_Erase
+        };
+
 typedef struct
 {
     ulint capacity;
@@ -152,4 +183,29 @@ void PVectorCallback_MoveLeft (void **item)
 void PVectorCallback_MoveRight (void **item)
 {
     *item = *(item - 1);
+}
+
+IOneDirectionIterator *PVectorIterator_AsIOneDirectionIterator ()
+{
+    return &PVectorIterator_IOneDirectionIterator;
+}
+
+IBiDirectionalIterator *PVectorIterator_AsIBiDirectionalIterator ()
+{
+    return &PVectorIterator_IBiDirectionalIterator;
+}
+
+ISizedContainer *PVector_AsISizedContainer ()
+{
+    return &PVector_ISizedContainer;
+}
+
+IIterableContainer *PVector_AsIIterableContainer ()
+{
+    return &PVector_IIterableContainer;
+}
+
+IMutableContainer *PVector_AsIMutableContainer ()
+{
+    return &PVector_IMutableContainer;
 }

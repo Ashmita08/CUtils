@@ -1,5 +1,5 @@
-#ifndef __CUTILS_CCONTAINERS_UTILS_H__
-#define __CUTILS_CCONTAINERS_UTILS_H__
+#ifndef __CUTILS_CCONTAINERS_INTERFACES_H__
+#define __CUTILS_CCONTAINERS_INTERFACES_H__
 
 #include <ShortTypes.h>
 
@@ -10,7 +10,7 @@ typedef struct {
     VirtualHandle (*Next) (VirtualHandle current);
     /// Must be O(1).
     void **(*Value) (VirtualHandle iterator);
-} ISignleDirectionalIterator;
+} IOneDirectionIterator;
 
 typedef struct {
     /// Must be O(1).
@@ -63,4 +63,4 @@ typedef struct {
             void (*KeyDestructor) (void **), void (*ValueDestructor) (void **));
 } IMapContainer;
 
-#endif // __CUTILS_CCONTAINERS_UTILS_H__
+#endif // __CUTILS_CCONTAINERS_INTERFACES_H__

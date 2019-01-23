@@ -2,6 +2,7 @@
 #define __CUTILS_CCONTAINERS_PVECTOR_H__
 
 #include <ShortTypes.h>
+#include "Interfaces.h"
 
 typedef void *PVectorHandle;
 typedef void **PVectorIterator;
@@ -26,5 +27,11 @@ void PVectorIterator_ForEachReversed (PVectorIterator begin, PVectorIterator las
 
 void PVectorCallback_MoveLeft (void **item);
 void PVectorCallback_MoveRight (void **item);
+
+IOneDirectionIterator *PVectorIterator_AsIOneDirectionIterator ();
+IBiDirectionalIterator *PVectorIterator_AsIBiDirectionalIterator ();
+ISizedContainer *PVector_AsISizedContainer ();
+IIterableContainer *PVector_AsIIterableContainer ();
+IMutableContainer *PVector_AsIMutableContainer ();
 
 #endif // __CUTILS_CCONTAINERS_PVECTOR_H__
