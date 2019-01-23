@@ -3,6 +3,8 @@ project (CUtils C CXX)
 enable_testing ()
 
 set (CMAKE_C_STANDARD 11)
+set (CMAKE_CXX_STANDARD 11)
+
 set (CUnit_DIR "${CUNIT_SDK}/CUnit/share/cmake/")
 find_package (CUnit REQUIRED)
 
