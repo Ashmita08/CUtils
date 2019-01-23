@@ -20,9 +20,9 @@ static void EmptyDestruct (void **item)
 
 }
 
-static int Comparator (const void *first, const void *second)
+static lint Comparator (const void *first, const void *second)
 {
-    return (int) first - (int) second;
+    return (lint) first - (lint) second;
 }
 
 clock_t PVectorHeap_Insert (bool reserve)
@@ -58,7 +58,7 @@ clock_t stdpriorityqueue_Insert ()
 void PVectorHeap_vs_stdpriorityqueue ()
 {
     printf ("PVectorHeap: items to insert -- %d.\n", TEST_AMOUNT);
-    printf ("PVectorHeap, no reserve: %dms.\n", (int) PVectorHeap_Insert (false) * 1000 / CLOCKS_PER_SEC);
-    printf ("PVectorHeap, reserve: %dms.\n", (int) PVectorHeap_Insert (true) * 1000 / CLOCKS_PER_SEC);
-    printf ("std::priority_queue: %dms.\n", (int) stdpriorityqueue_Insert () * 1000 / CLOCKS_PER_SEC);
+    printf ("PVectorHeap, no reserve: %dms.\n", (int) (PVectorHeap_Insert (false) * 1000 / CLOCKS_PER_SEC));
+    printf ("PVectorHeap, reserve: %dms.\n", (int) (PVectorHeap_Insert (true) * 1000 / CLOCKS_PER_SEC));
+    printf ("std::priority_queue: %dms.\n", (int) (stdpriorityqueue_Insert () * 1000 / CLOCKS_PER_SEC));
 }

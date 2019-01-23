@@ -15,7 +15,7 @@ void PDoubleLinkedListSuite_Helper_CheckSize (uint size)
 {
     if (size != PDoubleLinkedList_Size (pDoubleLinkedListHandle))
     {
-        printf ("\n        Size (e/a): %d, %d.", size, PDoubleLinkedList_Size (pDoubleLinkedListHandle));
+        printf ("\n        Size (e/a): %d, %d.", size, (int) PDoubleLinkedList_Size (pDoubleLinkedListHandle));
         CU_FAIL_FATAL ("Expected and actual values are not equal!");
     }
 }

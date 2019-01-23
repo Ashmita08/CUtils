@@ -14,7 +14,7 @@ void PSingleLinkedListSuite_Helper_CheckSize (uint size)
 {
     if (size != PSingleLinkedList_Size (pSingleLinkedListHandle))
     {
-        printf ("\n        Size (e/a): %d, %d.", size, PSingleLinkedList_Size (pSingleLinkedListHandle));
+        printf ("\n        Size (e/a): %d, %d.", size, (int) PSingleLinkedList_Size (pSingleLinkedListHandle));
         CU_FAIL_FATAL ("Expected and actual values are not equal!");
     }
 }

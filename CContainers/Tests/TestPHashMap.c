@@ -26,7 +26,7 @@ static void PHashMapSuite_Helper_CheckSize (uint size)
 {
     if (size != PHashMap_Size (pHashMapHandle))
     {
-        printf ("\n        Size (e/a): %d, %d.", size, PHashMap_Size (pHashMapHandle));
+        printf ("\n        Size (e/a): %d, %d.", size, (int) PHashMap_Size (pHashMapHandle));
         CU_FAIL_FATAL ("Expected and actual values are not equal!");
     }
 }
