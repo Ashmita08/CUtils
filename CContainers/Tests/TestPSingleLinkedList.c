@@ -1,8 +1,8 @@
 #include "TestPSingleLinkedList.h"
 #include <stdlib.h>
 
-#include <cunit/CUnit.h>
-#include <cunit/CUnitCI.h>
+#include <CUnit/CUnit.h>
+#include <CUnit/CUnitCI.h>
 
 #include <CContainers/PSingleLinkedList.h>
 #include <CContainers/Utils.h>
@@ -14,7 +14,7 @@ void PSingleLinkedListSuite_Helper_CheckSize (uint size)
 {
     if (size != PSingleLinkedList_Size (pSingleLinkedListHandle))
     {
-        printf ("\n        Size (e/a): %d, %d.", size, PSingleLinkedList_Size (pSingleLinkedListHandle));
+        printf ("\n        Size (e/a): %d, %d.", size, (int) PSingleLinkedList_Size (pSingleLinkedListHandle));
         CU_FAIL_FATAL ("Expected and actual values are not equal!");
     }
 }

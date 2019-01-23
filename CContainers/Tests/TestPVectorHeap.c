@@ -1,8 +1,8 @@
 #include "TestPVectorHeap.h"
 #include <stdlib.h>
 
-#include <cunit/CUnit.h>
-#include <cunit/CUnitCI.h>
+#include <CUnit/CUnit.h>
+#include <CUnit/CUnitCI.h>
 
 #include <CContainers/PVectorHeap.h>
 #include <CContainers/Utils.h>
@@ -28,7 +28,7 @@ static void PVectorHeapSuite_Helper_PushTestNumbers ()
 }
 
 /// Integer min heap comparator.
-static int PVectorHeapSuite_HeapComparator (const void *first, const void *second)
+static lint PVectorHeapSuite_HeapComparator (const void *first, const void *second)
 {
     return *((const int *) second) - *((const int *) first);
 }

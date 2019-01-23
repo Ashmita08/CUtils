@@ -48,12 +48,12 @@ void PVector_vs_stdvector ()
 {
     printf ("PVector: items to push back test: %d.\n", ITEMS_TO_PUSH_BACK_TEST);
     printf ("PVector int (no reserve): %dms.\n",
-            (int) PVector_IntPushBackAndDestroy (ITEMS_TO_PUSH_BACK_TEST, false) * 1000 / CLOCKS_PER_SEC);
+            (int) (PVector_IntPushBackAndDestroy (ITEMS_TO_PUSH_BACK_TEST, false) * 1000 / CLOCKS_PER_SEC));
     printf ("stdvector int (no reserve): %dms.\n",
-            (int) stdvector_IntPushBackAndDestroy (ITEMS_TO_PUSH_BACK_TEST, false) * 1000 / CLOCKS_PER_SEC);
+            (int) (stdvector_IntPushBackAndDestroy (ITEMS_TO_PUSH_BACK_TEST, false) * 1000 / CLOCKS_PER_SEC));
 
     printf ("PVector int (reserve): %dms.\n",
-            (int) PVector_IntPushBackAndDestroy (ITEMS_TO_PUSH_BACK_TEST, true) * 1000 / CLOCKS_PER_SEC);
+            (int) (PVector_IntPushBackAndDestroy (ITEMS_TO_PUSH_BACK_TEST, true) * 1000 / CLOCKS_PER_SEC));
     printf ("stdvector int (reserve): %dms.\n",
-            (int) stdvector_IntPushBackAndDestroy (ITEMS_TO_PUSH_BACK_TEST, true) * 1000 / CLOCKS_PER_SEC);
+            (int) (stdvector_IntPushBackAndDestroy (ITEMS_TO_PUSH_BACK_TEST, true) * 1000 / CLOCKS_PER_SEC));
 }

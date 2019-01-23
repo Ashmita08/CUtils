@@ -6,10 +6,10 @@
 #include "Interfaces.h"
 
 typedef void *PVectorHeapHandle;
-PVectorHeapHandle PVectorHeap_Create (uint initialCapacity, int (*Comparator) (const void *first, const void *second));
+PVectorHeapHandle PVectorHeap_Create (uint initialCapacity, lint (*Comparator) (const void *first, const void *second));
 /// Creates heap from given PVector. Given PVector would be captured and used as storage by created heap.
 PVectorHeapHandle PVectorHeap_Heapify (PVectorHandle vectorHandle,
-        int (*Comparator) (const void *first, const void *second));
+        lint (*Comparator) (const void *first, const void *second));
 void PVectorHeap_Destruct (PVectorHeapHandle handle, void (*DestructCallback) (void **item));
 
 ulint PVectorHeap_Size (PVectorHeapHandle handle);

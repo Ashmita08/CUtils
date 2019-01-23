@@ -18,7 +18,7 @@ IOrganizerContainer PVectorHeap_IOrganizerContainer =
 typedef struct
 {
     PVectorHandle vector;
-    int (*Comparator) (const void *first, const void *second);
+    lint (*Comparator) (const void *first, const void *second);
 } PVectorHeap;
 
 static void PVectorHeap_SiftDown (PVectorHeap *heap, uint elementIndex)
@@ -96,7 +96,7 @@ static void PVectorHeap_SiftUp (PVectorHeap *heap, uint elementIndex)
     }
 }
 
-PVectorHeapHandle PVectorHeap_Create (uint initialCapacity, int (*Comparator) (const void *first, const void *second))
+PVectorHeapHandle PVectorHeap_Create (uint initialCapacity, lint (*Comparator) (const void *first, const void *second))
 {
     PVectorHeap *heap = malloc (sizeof (PVectorHeap));
     heap->vector = PVector_Create (initialCapacity);
@@ -105,7 +105,7 @@ PVectorHeapHandle PVectorHeap_Create (uint initialCapacity, int (*Comparator) (c
 }
 
 PVectorHeapHandle PVectorHeap_Heapify (PVectorHandle vectorHandle,
-        int (*Comparator) (const void *first, const void *second))
+        lint (*Comparator) (const void *first, const void *second))
 {
     PVectorHeap *heap = malloc (sizeof (PVectorHeap));
     heap->vector = vectorHandle;

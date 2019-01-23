@@ -1,0 +1,12 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+
+before_script:
+  - git clone https://gitlab.com/cunity/cunit.git && cd cunit && mkdir build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=SDK && cmake --build . --target install && export CUNIT_SDK="$PWD/SDK" && cd .. && cd ..
+
+script:
+  - echo $CUNIT_SDK
+  - mkdir build && cd build && cmake .. -DCMAKE_PREFIX_PATH="$CUNIT_SDK/CUnit/share/cmake" -DCUNIT_SDK="$CUNIT_SDK" && cmake --build . --target all && ctest
+  - echo "Testing log:" && cat "Testing/Temporary/LastTest.log"

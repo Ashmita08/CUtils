@@ -4,8 +4,8 @@
 #include "TestPVectorHeap.h"
 #include "TestPHashMap.h"
 
-#include <cunit/CUnit.h>
-#include <cunit/CUnitCI.h>
+#include <CUnit/CUnit.h>
+#include <CUnit/CUnitCI.h>
 
 int main (int argc, char **argv)
 {

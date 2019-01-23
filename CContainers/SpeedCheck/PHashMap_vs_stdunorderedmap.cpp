@@ -71,7 +71,7 @@ clock_t stdunorderedmap_InsertAndCheckContains ()
 void PHashMap_vs_stdunorderedmap ()
 {
     printf ("PHashMap: items to insert and check -- %d.\n", TEST_AMOUNT);
-    printf ("PHashMap, no reserve: %dms.\n", (int) PHashMap_InsertAndCheckContains (false) * 1000 / CLOCKS_PER_SEC);
-    printf ("PHashMap, reserve: %dms.\n", (int) PHashMap_InsertAndCheckContains (true) * 1000 / CLOCKS_PER_SEC);
-    printf ("std::unordered_set: %dms.\n", (int) stdunorderedmap_InsertAndCheckContains () * 1000 / CLOCKS_PER_SEC);
+    printf ("PHashMap, no reserve: %dms.\n", (int) (PHashMap_InsertAndCheckContains (false) * 1000 / CLOCKS_PER_SEC));
+    printf ("PHashMap, reserve: %dms.\n", (int) (PHashMap_InsertAndCheckContains (true) * 1000 / CLOCKS_PER_SEC));
+    printf ("std::unordered_set: %dms.\n", (int) (stdunorderedmap_InsertAndCheckContains () * 1000 / CLOCKS_PER_SEC));
 }

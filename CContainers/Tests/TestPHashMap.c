@@ -1,8 +1,8 @@
 #include "TestPHashMap.h"
 #include <stdlib.h>
 
-#include <cunit/CUnit.h>
-#include <cunit/CUnitCI.h>
+#include <CUnit/CUnit.h>
+#include <CUnit/CUnitCI.h>
 
 #include <CContainers/PHashMap.h>
 #include <CContainers/Utils.h>
@@ -14,19 +14,19 @@ PHashMapHandle pHashMapHandle;
 
 ulint HashKey (void *key)
 {
-    return *(ulint *) key;
+    return (ulint) *(int *) key;
 }
 
 lint KeyCompare (void *first, void *second)
 {
-    return *(lint *) first - *(lint *) second;
+    return *(int *) first - *(int *) second;
 }
 
 static void PHashMapSuite_Helper_CheckSize (uint size)
 {
     if (size != PHashMap_Size (pHashMapHandle))
     {
-        printf ("\n        Size (e/a): %d, %d.", size, PHashMap_Size (pHashMapHandle));
+        printf ("\n        Size (e/a): %d, %d.", size, (int) PHashMap_Size (pHashMapHandle));
         CU_FAIL_FATAL ("Expected and actual values are not equal!");
     }
 }

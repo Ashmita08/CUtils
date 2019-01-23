@@ -1,8 +1,8 @@
 #include "TestPVector.h"
 #include <stdlib.h>
 
-#include <cunit/CUnit.h>
-#include <cunit/CUnitCI.h>
+#include <CUnit/CUnit.h>
+#include <CUnit/CUnitCI.h>
 
 #include <CContainers/PVector.h>
 #include <CContainers/Utils.h>
@@ -14,7 +14,7 @@ void PVectorSuite_Helper_CheckSize (uint size)
 {
     if (size != PVector_Size (pVectorHandle))
     {
-        printf ("\n        Size (e/a): %d, %d.", size, PVector_Size (pVectorHandle));
+        printf ("\n        Size (e/a): %d, %d.", size, (int) PVector_Size (pVectorHandle));
         CU_FAIL_FATAL ("Expected and actual values are not equal!");
     }
 }
