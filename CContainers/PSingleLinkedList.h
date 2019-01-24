@@ -29,7 +29,7 @@ void PSingleLinkedListIterator_ForEach (PSingleLinkedListIterator begin, PSingle
         void (*Callback) (void **item));
 
 IOneDirectionIterator *PSingleLinkedListIterator_AsIOneDirectionIterator ();
-ISizedContainer *PSingleLinkedList_AsIISizedContaine ();
+ISizedContainer *PSingleLinkedList_AsISizedContainer ();
 IIterableContainer *PSingleLinkedList_AsIIterableContainer ();
 IOrganizerContainer *PSingleLinkedList_AsIOrganizerContainer ();
 

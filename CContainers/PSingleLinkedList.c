@@ -228,7 +228,7 @@ IOneDirectionIterator *PSingleLinkedListIterator_AsIOneDirectionIterator ()
     return &PSingleLinkedListIterator_IOneDirectionIterator;
 }
 
-ISizedContainer *PSingleLinkedList_AsIISizedContaine ()
+ISizedContainer *PSingleLinkedList_AsISizedContainer ()
 {
     return &PSingleLinkedList_IISizedContainer;
 }
