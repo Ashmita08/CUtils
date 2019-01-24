@@ -8,6 +8,7 @@
 typedef void *PVectorHeapHandle;
 PVectorHeapHandle PVectorHeap_Create (uint initialCapacity, lint (*Comparator) (const void *first, const void *second));
 /// Creates heap from given PVector. Given PVector would be captured and used as storage by created heap.
+// TODO: Maybe use any IIterable+IMutable for Heapify, than rewrite heap to use this interfaces, by default init as PVector.
 PVectorHeapHandle PVectorHeap_Heapify (PVectorHandle vectorHandle,
         lint (*Comparator) (const void *first, const void *second));
 void PVectorHeap_Destruct (PVectorHeapHandle handle, void (*DestructCallback) (void **item));
