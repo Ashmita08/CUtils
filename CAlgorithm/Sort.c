@@ -13,6 +13,7 @@ void HeapSort (VirtualHandle container, ISizedContainer *ISized,
     while (iterator != IIterable->End (container))
     {
         PVector_Insert (vector, PVector_End (vector), *(IIterator->Value (iterator)));
+        iterator = IIterator->Next (iterator);
     }
 
     PVectorHeapHandle heap = PVectorHeap_Heapify (vector, Comparator);
@@ -23,6 +24,7 @@ void HeapSort (VirtualHandle container, ISizedContainer *ISized,
         // Const qualifier discarded not by mistake!
         *(IIterator->Value (iterator)) = PVectorHeap_Top (heap);
         PVectorHeap_Pop (heap);
+        iterator = IIterator->Next (iterator);
     }
 
     PVectorHeap_Destruct (heap, ContainerCallback_NoAction);
