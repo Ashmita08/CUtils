@@ -5,6 +5,7 @@
 #include <CUnit/CUnitCI.h>
 
 #include <CContainers/PVectorHeap.h>
+#include <CContainers/PVector.h>
 #include <CContainers/Utils.h>
 
 #define TEST_HEAP_CAPACITY 10
@@ -40,7 +41,7 @@ static void PVectorHeapSuite_Setup ()
 
 static void PVectorHeapSuite_Teardown ()
 {
-    PVectorHeap_Destruct (pVectorHeapHandle, ContainerCallback_Free);
+    PVectorHeap_Destruct (pVectorHeapHandle, PVector_Destruct, ContainerCallback_Free);
     CContainers_SetLastError (0);
 }
 
@@ -97,7 +98,10 @@ static void PVectorHeapSuite_Heapify ()
         PVector_Insert (initialVector, PVector_End (initialVector), new);
     }
 
-    PVectorHeapHandle heap = PVectorHeap_Heapify (initialVector, PVectorHeapSuite_HeapComparator);
+    PVectorHeapHandle heap = PVectorHeap_Heapify (initialVector, PVector_AsISizedContainer (),
+            PVector_AsIIterableContainer (), PVectorIterator_AsIBiDirectionalIterator (),
+            PVector_AsIMutableContainer (), PVectorHeapSuite_HeapComparator);
+
     for (uint index = 0; index < TEST_HEAP_NUMBERS_COUNT / 2; index++)
     {
         int value = **((int **) PVectorIterator_ValueAt (PVector_At (initialVector, index)));
@@ -125,7 +129,7 @@ static void PVectorHeapSuite_Heapify ()
         }
     }
     
-    PVectorHeap_Destruct (heap, ContainerCallback_Free);
+    PVectorHeap_Destruct (heap, PVector_Destruct, ContainerCallback_Free);
 }
 
 void RegisterPVectorHeapSuite ()

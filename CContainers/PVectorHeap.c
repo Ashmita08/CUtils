@@ -1,5 +1,6 @@
 #include "PVectorHeap.h"
 #include "Utils.h"
+#include "PVector.h"
 #include "Errors.h"
 #include <stdlib.h>
 
@@ -17,23 +18,27 @@ IOrganizerContainer PVectorHeap_IOrganizerContainer =
 
 typedef struct
 {
-    PVectorHandle vector;
+    VirtualHandle vector;
+    ISizedContainer *ISized;
+    IIterableContainer *IIterable;
+    IBiDirectionalIterator *IIterator;
+    IMutableContainer *IMutable;
     lint (*Comparator) (const void *first, const void *second);
 } PVectorHeap;
 
-static void PVectorHeap_SiftDown (PVectorHeap *heap, uint elementIndex)
+static void PVectorHeap_SiftDown (PVectorHeap *heap, ulint elementIndex)
 {
-    uint leftChild = elementIndex * 2 + 1;
-    uint rightChild = elementIndex * 2 + 2;
-    uint size = PVector_Size (heap->vector);
+    ulint leftChild = elementIndex * 2 + 1;
+    ulint rightChild = elementIndex * 2 + 2;
+    ulint size = heap->ISized->Size (heap->vector);
 
     if (rightChild > size)
     {
         return;
     }
 
-    void **current = PVectorIterator_ValueAt (PVector_At (heap->vector, elementIndex));
-    void **left = PVectorIterator_ValueAt (PVector_At (heap->vector, leftChild));
+    void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));
+    void **left = heap->IIterator->Value (heap->IIterable->At (heap->vector, leftChild));
 
     if (rightChild == size)
     {
@@ -46,9 +51,9 @@ static void PVectorHeap_SiftDown (PVectorHeap *heap, uint elementIndex)
     }
     else
     {
-        void **right = PVectorIterator_ValueAt (PVector_At (heap->vector, rightChild));
+        void **right = heap->IIterator->Value (heap->IIterable->At (heap->vector, rightChild));
         void **better = NULL;
-        uint betterIndex;
+        ulint betterIndex;
 
         if (heap->Comparator (*right, *left) > 0)
         {
@@ -71,21 +76,21 @@ static void PVectorHeap_SiftDown (PVectorHeap *heap, uint elementIndex)
     }
 }
 
-static void PVectorHeap_SiftUp (PVectorHeap *heap, uint elementIndex)
+static void PVectorHeap_SiftUp (PVectorHeap *heap, ulint elementIndex)
 {
     if (elementIndex == 0)
     {
         return;
     }
 
-    uint parentIndex = elementIndex / 2;
+    ulint parentIndex = elementIndex / 2;
     if (elementIndex % 2 == 0)
     {
         --parentIndex;
     }
 
-    void **current = PVectorIterator_ValueAt (PVector_At (heap->vector, elementIndex));
-    void **parent = PVectorIterator_ValueAt (PVector_At (heap->vector, parentIndex));
+    void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));;
+    void **parent = heap->IIterator->Value (heap->IIterable->At (heap->vector, parentIndex));;
 
     if (heap->Comparator (*current, *parent) > 0)
     {
@@ -96,23 +101,32 @@ static void PVectorHeap_SiftUp (PVectorHeap *heap, uint elementIndex)
     }
 }
 
-PVectorHeapHandle PVectorHeap_Create (uint initialCapacity, lint (*Comparator) (const void *first, const void *second))
+PVectorHeapHandle PVectorHeap_Create (ulint initialCapacity, lint (*Comparator) (const void *first, const void *second))
 {
     PVectorHeap *heap = malloc (sizeof (PVectorHeap));
     heap->vector = PVector_Create (initialCapacity);
+    heap->ISized = PVector_AsISizedContainer ();
+    heap->IIterable = PVector_AsIIterableContainer ();
+    heap->IIterator = PVectorIterator_AsIBiDirectionalIterator ();
+    heap->IMutable = PVector_AsIMutableContainer ();
     heap->Comparator = Comparator;
     return (PVectorHandle) heap;
 }
 
-PVectorHeapHandle PVectorHeap_Heapify (PVectorHandle vectorHandle,
+PVectorHeapHandle PVectorHeap_Heapify (VirtualHandle vector, ISizedContainer *ISized,
+        IIterableContainer *IIterable, IBiDirectionalIterator *IIterator, IMutableContainer *IMutable,
         lint (*Comparator) (const void *first, const void *second))
 {
     PVectorHeap *heap = malloc (sizeof (PVectorHeap));
-    heap->vector = vectorHandle;
+    heap->vector = vector;
+    heap->ISized = ISized;
+    heap->IIterable = IIterable;
+    heap->IIterator = IIterator;
+    heap->IMutable = IMutable;
     heap->Comparator = Comparator;
 
-    uint size = PVector_Size (vectorHandle);
-    for (uint index = size / 2; index < size; --index)
+    ulint size = ISized->Size (heap->vector);
+    for (ulint index = size / 2; index < size; --index)
     {
         PVectorHeap_SiftDown (heap, index);
     }
@@ -120,17 +134,19 @@ PVectorHeapHandle PVectorHeap_Heapify (PVectorHandle vectorHandle,
     return (PVectorHandle) heap;
 }
 
-void PVectorHeap_Destruct (PVectorHeapHandle handle, void (*DestructCallback) (void **item))
+void PVectorHeap_Destruct (PVectorHeapHandle handle,
+        void (*BaseDestructor) (VirtualHandle vector, void (*DestructCallback) (void **item)),
+        void (*DestructCallback) (void **item))
 {
     PVectorHeap *heap = (PVectorHeap *) handle;
-    PVector_Destruct (heap->vector, DestructCallback);
+    BaseDestructor (heap->vector, DestructCallback);
     free (heap);
 }
 
 ulint PVectorHeap_Size (PVectorHeapHandle handle)
 {
     PVectorHeap *heap = (PVectorHeap *) handle;
-    return PVector_Size (heap->vector);
+    return heap->ISized->Size (heap->vector);
 }
 
 const void *PVectorHeap_Top (PVectorHeapHandle handle)
@@ -138,7 +154,7 @@ const void *PVectorHeap_Top (PVectorHeapHandle handle)
     if (PVectorHeap_Size (handle) > 0)
     {
         PVectorHeap *heap = (PVectorHeap *) handle;
-        return *PVectorIterator_ValueAt (PVector_Begin (heap->vector));
+        return *heap->IIterator->Value (heap->IIterable->Begin (heap->vector));
     }
     else
     {
@@ -151,10 +167,10 @@ void PVectorHeap_Pop (PVectorHeapHandle handle)
     if (PVectorHeap_Size (handle) > 0)
     {
         PVectorHeap *heap = (PVectorHeap *) handle;
-        *PVectorIterator_ValueAt (PVector_Begin (heap->vector)) = *PVectorIterator_ValueAt (
-                PVectorIterator_Previous (PVector_End (heap->vector)));
+        *heap->IIterator->Value (heap->IIterable->Begin (heap->vector)) = *heap->IIterator->Value (
+                heap->IIterator->Previous (heap->IIterable->End (heap->vector)));
 
-        PVector_Erase (heap->vector, PVectorIterator_Previous (PVector_End (heap->vector)));
+        heap->IMutable->Erase (heap->vector, heap->IIterator->Previous (heap->IIterable->End (heap->vector)));
         PVectorHeap_SiftDown (heap, 0);
     }
 }
@@ -162,8 +178,8 @@ void PVectorHeap_Pop (PVectorHeapHandle handle)
 void PVectorHeap_Push (PVectorHeapHandle handle, void *value)
 {
     PVectorHeap *heap = (PVectorHeap *) handle;
-    PVector_Insert (heap->vector, PVector_End (heap->vector), value);
-    PVectorHeap_SiftUp (heap, PVector_Size (heap->vector) - 1);
+    heap->IMutable->Insert (heap->vector, heap->IIterable->End (heap->vector), value);
+    PVectorHeap_SiftUp (heap, PVectorHeap_Size (handle) - 1);
 }
 
 ISizedContainer *PVectorHeap_AsISizedContainer ()

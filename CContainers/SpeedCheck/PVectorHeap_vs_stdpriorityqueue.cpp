@@ -8,6 +8,7 @@ extern "C"
 {
 #include <ShortTypes.h>
 #include <CContainers/PVectorHeap.h>
+#include <CContainers/PVector.h>
 #include <CContainers/Utils.h>
 }
 
@@ -36,7 +37,7 @@ clock_t PVectorHeap_Insert (bool reserve)
         PVectorHeap_Push (heap, (void *) rand ());
     }
 
-    PVector_Destruct (heap, EmptyDestruct);
+    PVectorHeap_Destruct (heap, PVector_Destruct, EmptyDestruct);
     return clock () - begin;
 }
 

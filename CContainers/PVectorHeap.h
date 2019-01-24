@@ -2,16 +2,18 @@
 #define __CUTILS_CCONTAINERS_PVECTORHEAP_H__
 
 #include <ShortTypes.h>
-#include "PVector.h"
 #include "Interfaces.h"
 
 typedef void *PVectorHeapHandle;
-PVectorHeapHandle PVectorHeap_Create (uint initialCapacity, lint (*Comparator) (const void *first, const void *second));
+PVectorHeapHandle PVectorHeap_Create (ulint initialCapacity, lint (*Comparator) (const void *first, const void *second));
 /// Creates heap from given PVector. Given PVector would be captured and used as storage by created heap.
-// TODO: Maybe use any IIterable+IMutable for Heapify, than rewrite heap to use this interfaces, by default init as PVector.
-PVectorHeapHandle PVectorHeap_Heapify (PVectorHandle vectorHandle,
+PVectorHeapHandle PVectorHeap_Heapify (VirtualHandle vector, ISizedContainer *ISized,
+        IIterableContainer *IIterable, IBiDirectionalIterator *IIterator, IMutableContainer *IMutable,
         lint (*Comparator) (const void *first, const void *second));
-void PVectorHeap_Destruct (PVectorHeapHandle handle, void (*DestructCallback) (void **item));
+
+void PVectorHeap_Destruct (PVectorHeapHandle handle,
+        void (*BaseDestructor) (VirtualHandle vector, void (*DestructCallback) (void **item)),
+        void (*DestructCallback) (void **item));
 
 ulint PVectorHeap_Size (PVectorHeapHandle handle);
 const void *PVectorHeap_Top (PVectorHeapHandle handle);
