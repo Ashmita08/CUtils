@@ -24,13 +24,6 @@ PDoubleLinkedListIterator PDoubleLinkedListIterator_Next (PDoubleLinkedListItera
 PDoubleLinkedListIterator PDoubleLinkedListIterator_Previous (PDoubleLinkedListIterator iterator);
 void **PDoubleLinkedListIterator_ValueAt (PDoubleLinkedListIterator iterator);
 
-// TODO: ForEach are equal for all iterable containers, move to CAlgorithm?
-void PDoubleLinkedListIterator_ForEach (PDoubleLinkedListIterator begin, PDoubleLinkedListIterator end,
-        void (*Callback) (void **item));
-// TODO: ForEachReversed are equal for all 2-direction iterable containers, move to CAlgorithm?
-void PDoubleLinkedListIterator_ForEachReversed (PDoubleLinkedListIterator begin, PDoubleLinkedListIterator last,
-        void (*Callback) (void **item));
-
 IOneDirectionIterator *PDoubleLinkedListIterator_AsIOneDirectionIterator ();
 IBiDirectionalIterator *PDoubleLinkedListIterator_AsIBiDirectionalIterator ();
 ISizedContainer *PDoubleLinkedList_AsISizedContainer ();

@@ -189,26 +189,6 @@ void **PDoubleLinkedListIterator_ValueAt (PDoubleLinkedListIterator iterator)
     return &(node->value);
 }
 
-void PDoubleLinkedListIterator_ForEach (PDoubleLinkedListIterator begin, PDoubleLinkedListIterator end,
-        void (*Callback) (void **item))
-{
-    while (begin != end)
-    {
-        Callback (PDoubleLinkedListIterator_ValueAt (begin));
-        begin = PDoubleLinkedListIterator_Next (begin);
-    }
-}
-
-void PDoubleLinkedListIterator_ForEachReversed (PDoubleLinkedListIterator begin, PDoubleLinkedListIterator last,
-        void (*Callback) (void **item))
-{
-    do
-    {
-        Callback (PDoubleLinkedListIterator_ValueAt (last));
-        last = PDoubleLinkedListIterator_Previous (last);
-    } while (begin != last);
-}
-
 IOneDirectionIterator *PDoubleLinkedListIterator_AsIOneDirectionIterator ()
 {
     return &PDoubleLinkedListIterator_IOneDirectionIterator;

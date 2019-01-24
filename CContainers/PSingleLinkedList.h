@@ -25,8 +25,6 @@ PSingleLinkedListIterator PSingleLinkedList_EraseNext (PSingleLinkedListHandle h
 
 PSingleLinkedListIterator PSingleLinkedListIterator_Next (PSingleLinkedListIterator iterator);
 void **PSingleLinkedListIterator_ValueAt (PSingleLinkedListIterator iterator);
-void PSingleLinkedListIterator_ForEach (PSingleLinkedListIterator begin, PSingleLinkedListIterator end,
-        void (*Callback) (void **item));
 
 IOneDirectionIterator *PSingleLinkedListIterator_AsIOneDirectionIterator ();
 ISizedContainer *PSingleLinkedList_AsISizedContainer ();

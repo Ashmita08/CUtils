@@ -45,6 +45,16 @@ typedef struct
     void **buffer;
 } PVector;
 
+void PVectorCallback_MoveLeft (void **item)
+{
+    *item = *(item + 1);
+}
+
+void PVectorCallback_MoveRight (void **item)
+{
+    *item = *(item - 1);
+}
+
 PVectorHandle PVector_Create (ulint initialCapacity)
 {
     PVector *vector = malloc (sizeof (PVector));
@@ -57,7 +67,9 @@ PVectorHandle PVector_Create (ulint initialCapacity)
 void PVector_Destruct (PVectorHandle handle, void (*DestructCallback) (void **item))
 {
     PVector *vector = (PVector *) handle;
-    PVectorIterator_ForEach (PVector_Begin (handle), PVector_End (handle), DestructCallback);
+    CContainers_ForEach (PVector_Begin (handle), PVector_End (handle), 
+            PVectorIterator_AsIOneDirectionIterator (), DestructCallback);
+    
     free (vector->buffer);
     free (vector);
 }
@@ -112,8 +124,8 @@ PVectorIterator PVector_Insert (PVectorHandle handle, PVectorIterator where, voi
 
     if (where < PVectorIterator_Previous (PVector_End (handle)))
     {
-        PVectorIterator_ForEachReversed (PVectorIterator_Next (where),
-                PVectorIterator_Previous (PVector_End (handle)), PVectorCallback_MoveRight);
+        CContainers_ForEachReversed (PVectorIterator_Next (where), PVectorIterator_Previous (PVector_End (handle)),
+                PVectorIterator_AsIBiDirectionalIterator (), PVectorCallback_MoveRight);
     }
     
     *PVectorIterator_ValueAt (where) = value;
@@ -130,7 +142,8 @@ PVectorIterator PVector_Erase (PVectorHandle handle, PVectorIterator iterator)
     }
 
     vector->size -= 1;
-    PVectorIterator_ForEach (iterator, PVector_End (handle), PVectorCallback_MoveLeft);
+    CContainers_ForEach (iterator, PVector_End (handle),
+            PVectorIterator_AsIOneDirectionIterator (), PVectorCallback_MoveLeft);
 
     if (iterator >= PVector_End (handle))
     {
@@ -155,34 +168,6 @@ PVectorIterator PVectorIterator_Previous (PVectorIterator iterator)
 void **PVectorIterator_ValueAt (PVectorIterator iterator)
 {
     return iterator;
-}
-
-void PVectorIterator_ForEach (PVectorIterator begin, PVectorIterator end, void (*Callback) (void **item))
-{
-    while (begin != end)
-    {
-        Callback (PVectorIterator_ValueAt (begin));
-        begin = PVectorIterator_Next (begin);
-    }
-}
-
-void PVectorIterator_ForEachReversed (PVectorIterator begin, PVectorIterator last, void (*Callback) (void **item))
-{
-    while (last >= begin)
-    {
-        Callback (PVectorIterator_ValueAt (last));
-        last = PVectorIterator_Previous (last);
-    }
-}
-
-void PVectorCallback_MoveLeft (void **item)
-{
-    *item = *(item + 1);
-}
-
-void PVectorCallback_MoveRight (void **item)
-{
-    *item = *(item - 1);
 }
 
 IOneDirectionIterator *PVectorIterator_AsIOneDirectionIterator ()

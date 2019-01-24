@@ -22,12 +22,6 @@ PVectorIterator PVectorIterator_Next (PVectorIterator iterator);
 PVectorIterator PVectorIterator_Previous (PVectorIterator iterator);
 void **PVectorIterator_ValueAt (PVectorIterator iterator);
 
-void PVectorIterator_ForEach (PVectorIterator begin, PVectorIterator end, void (*Callback) (void **item));
-void PVectorIterator_ForEachReversed (PVectorIterator begin, PVectorIterator last, void (*Callback) (void **item));
-
-void PVectorCallback_MoveLeft (void **item);
-void PVectorCallback_MoveRight (void **item);
-
 IOneDirectionIterator *PVectorIterator_AsIOneDirectionIterator ();
 IBiDirectionalIterator *PVectorIterator_AsIBiDirectionalIterator ();
 ISizedContainer *PVector_AsISizedContainer ();
