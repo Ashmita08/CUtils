@@ -18,6 +18,11 @@ void ContainerCallback_Free (void **item)
     free (*item);
 }
 
+void ContainerCallback_NoAction (void **item)
+{
+
+}
+
 void CContainers_ForEach (VirtualHandle begin, VirtualHandle end,
         IOneDirectionIterator *IIterator, void (*Callback) (void **item))
 {
