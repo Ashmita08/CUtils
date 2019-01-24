@@ -14,5 +14,5 @@ int main (int argc, char **argv)
     RegisterPDoubleLinkedListSuite ();
     RegisterPVectorHeapSuite ();
     RegisterPHashMapSuite ();
-    return CU_CI_RUN_SUITES();
+    return CU_CI_RUN_SUITES ();
 }
