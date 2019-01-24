@@ -6,59 +6,10 @@
 
 #include <CContainers/PSingleLinkedList.h>
 #include <CContainers/Utils.h>
+#include "Utils.h"
 
 #define TEST_LIST_SIZE 10
 static PSingleLinkedListHandle pSingleLinkedListHandle;
-
-void PSingleLinkedListSuite_Helper_CheckSize (uint size)
-{
-    if (size != PSingleLinkedList_Size (pSingleLinkedListHandle))
-    {
-        printf ("\n        Size (e/a): %d, %d.", size, (int) PSingleLinkedList_Size (pSingleLinkedListHandle));
-        CU_FAIL_FATAL ("Expected and actual values are not equal!");
-    }
-}
-
-static int CheckIterationOrderCallback_number = 0;
-
-void CheckIterationOrderCallback (void **item)
-{
-    int number = **((int **) item);
-    if (CheckIterationOrderCallback_number != number)
-    {
-        printf ("\nValue at %d (e/a): %d, %d.", CheckIterationOrderCallback_number,
-                CheckIterationOrderCallback_number, number);
-    }
-
-    ++CheckIterationOrderCallback_number;
-}
-
-void PSingleLinkedListSuite_Helper_IterateCheckNaturalOrdered ()
-{
-    CheckIterationOrderCallback_number = 0;
-    PSingleLinkedListIterator_ForEach (PSingleLinkedList_Begin (pSingleLinkedListHandle),
-            PSingleLinkedList_End (pSingleLinkedListHandle), CheckIterationOrderCallback);
-}
-
-void PSingleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (uint size)
-{
-    for (uint index = 0; index < size; ++index)
-    {
-        PSingleLinkedListIterator iterator = PSingleLinkedList_At (pSingleLinkedListHandle, index);
-        if (CContainers_GetLastError () != 0)
-        {
-            printf ("\n        CContainers internal error code: %d.\n", CContainers_GetLastError ());
-            CU_FAIL_FATAL ("CContainers internal error!");
-        }
-
-        int value = **((int **) PSingleLinkedListIterator_ValueAt (iterator));
-        if (value != index)
-        {
-            printf ("\n        Value at %d (e/a): %d, %d.", index, index, value);
-            CU_FAIL ("Vector content is incorrect!");
-        }
-    }
-}
 
 void PSingleLinkedListSuite_Setup ()
 {
@@ -86,9 +37,12 @@ void PSingleLinkedListSuite_InsertFrontAndIterate ()
         }
     }
 
-    PSingleLinkedListSuite_Helper_CheckSize (TEST_LIST_SIZE);
-    PSingleLinkedListSuite_Helper_IterateCheckNaturalOrdered ();
-    PSingleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (TEST_LIST_SIZE);
+    SizeChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (), TEST_LIST_SIZE, 1);
+    IterationNaturalOrderChecker (pSingleLinkedListHandle,
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
+
+    ItemAtNaturalOrderChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (),
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PSingleLinkedListSuite_InsertLastAndIterate ()
@@ -107,9 +61,12 @@ void PSingleLinkedListSuite_InsertLastAndIterate ()
         }
     }
 
-    PSingleLinkedListSuite_Helper_CheckSize (2);
-    PSingleLinkedListSuite_Helper_IterateCheckNaturalOrdered ();
-    PSingleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (2);
+    SizeChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (), 2, 1);
+    IterationNaturalOrderChecker (pSingleLinkedListHandle,
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
+
+    ItemAtNaturalOrderChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (),
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PSingleLinkedListSuite_InsertMiddleAndIterate ()
@@ -137,9 +94,12 @@ void PSingleLinkedListSuite_InsertMiddleAndIterate ()
     PSingleLinkedList_InsertAfter (pSingleLinkedListHandle,
             PSingleLinkedList_At (pSingleLinkedListHandle, TEST_LIST_SIZE / 3 - 1), value);
 
-    PSingleLinkedListSuite_Helper_CheckSize (TEST_LIST_SIZE);
-    PSingleLinkedListSuite_Helper_IterateCheckNaturalOrdered ();
-    PSingleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (TEST_LIST_SIZE);
+    SizeChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (), TEST_LIST_SIZE, 1);
+    IterationNaturalOrderChecker (pSingleLinkedListHandle,
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
+
+    ItemAtNaturalOrderChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (),
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PSingleLinkedListSuite_EraseFirstAndIterate ()
@@ -158,9 +118,12 @@ void PSingleLinkedListSuite_EraseFirstAndIterate ()
     }
 
     PSingleLinkedList_Erase (pSingleLinkedListHandle, PSingleLinkedList_Begin (pSingleLinkedListHandle));
-    PSingleLinkedListSuite_Helper_CheckSize (TEST_LIST_SIZE - 1);
-    PSingleLinkedListSuite_Helper_IterateCheckNaturalOrdered ();
-    PSingleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (TEST_LIST_SIZE - 1);
+    SizeChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (), TEST_LIST_SIZE - 1, 1);
+    IterationNaturalOrderChecker (pSingleLinkedListHandle,
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
+
+    ItemAtNaturalOrderChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (),
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PSingleLinkedListSuite_EraseLastAndIterate ()
@@ -181,9 +144,12 @@ void PSingleLinkedListSuite_EraseLastAndIterate ()
     PSingleLinkedList_Erase (pSingleLinkedListHandle,
             PSingleLinkedList_At (pSingleLinkedListHandle, TEST_LIST_SIZE - 1));
 
-    PSingleLinkedListSuite_Helper_CheckSize (TEST_LIST_SIZE - 1);
-    PSingleLinkedListSuite_Helper_IterateCheckNaturalOrdered ();
-    PSingleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (TEST_LIST_SIZE - 1);
+    SizeChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (), TEST_LIST_SIZE - 1, 1);
+    IterationNaturalOrderChecker (pSingleLinkedListHandle,
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
+
+    ItemAtNaturalOrderChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (),
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PSingleLinkedListSuite_EraseMiddleAndIterate ()
@@ -204,9 +170,12 @@ void PSingleLinkedListSuite_EraseMiddleAndIterate ()
     PSingleLinkedList_Erase (pSingleLinkedListHandle,
             PSingleLinkedList_At (pSingleLinkedListHandle, TEST_LIST_SIZE / 2));
 
-    PSingleLinkedListSuite_Helper_CheckSize (TEST_LIST_SIZE - 1);
-    PSingleLinkedListSuite_Helper_IterateCheckNaturalOrdered ();
-    PSingleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (TEST_LIST_SIZE - 1);
+    SizeChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (), TEST_LIST_SIZE - 1, 1);
+    IterationNaturalOrderChecker (pSingleLinkedListHandle,
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
+
+    ItemAtNaturalOrderChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (),
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PSingleLinkedListSuite_EraseNextAndIterateNothing ()
@@ -227,9 +196,12 @@ void PSingleLinkedListSuite_EraseNextAndIterateNothing ()
     PSingleLinkedList_EraseNext (pSingleLinkedListHandle,
             PSingleLinkedList_At (pSingleLinkedListHandle, TEST_LIST_SIZE - 1));
 
-    PSingleLinkedListSuite_Helper_CheckSize (TEST_LIST_SIZE);
-    PSingleLinkedListSuite_Helper_IterateCheckNaturalOrdered ();
-    PSingleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (TEST_LIST_SIZE);
+    SizeChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (), TEST_LIST_SIZE, 1);
+    IterationNaturalOrderChecker (pSingleLinkedListHandle,
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
+
+    ItemAtNaturalOrderChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (),
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PSingleLinkedListSuite_EraseNextAndIterate ()
@@ -250,9 +222,12 @@ void PSingleLinkedListSuite_EraseNextAndIterate ()
     PSingleLinkedList_EraseNext (pSingleLinkedListHandle,
             PSingleLinkedList_At (pSingleLinkedListHandle, TEST_LIST_SIZE / 2 - 1));
 
-    PSingleLinkedListSuite_Helper_CheckSize (TEST_LIST_SIZE - 1);
-    PSingleLinkedListSuite_Helper_IterateCheckNaturalOrdered ();
-    PSingleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (TEST_LIST_SIZE - 1);
+    SizeChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (), TEST_LIST_SIZE - 1, 1);
+    IterationNaturalOrderChecker (pSingleLinkedListHandle,
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
+
+    ItemAtNaturalOrderChecker (pSingleLinkedListHandle, PSingleLinkedList_AsISizedContainer (),
+            PSingleLinkedList_AsIIterableContainer (), PSingleLinkedListIterator_AsIOneDirectionIterator (), 0);
 }
 
 void RegisterPSingleLinkedListSuite ()

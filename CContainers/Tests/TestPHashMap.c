@@ -6,6 +6,7 @@
 
 #include <CContainers/PHashMap.h>
 #include <CContainers/Utils.h>
+#include "Utils.h"
 
 #define INITIAL_BUCKETS_COUNT 10
 #define MAX_LOAD 5
@@ -20,15 +21,6 @@ ulint HashKey (void *key)
 lint KeyCompare (void *first, void *second)
 {
     return *(int *) first - *(int *) second;
-}
-
-static void PHashMapSuite_Helper_CheckSize (uint size)
-{
-    if (size != PHashMap_Size (pHashMapHandle))
-    {
-        printf ("\n        Size (e/a): %d, %d.", size, (int) PHashMap_Size (pHashMapHandle));
-        CU_FAIL_FATAL ("Expected and actual values are not equal!");
-    }
 }
 
 static void PHashMapSuite_Helper_FillHashMap (uint count)
@@ -48,7 +40,7 @@ static void PHashMapSuite_Helper_FillHashMap (uint count)
 static void PHashMapSuite_Helper_ContainsTest (uint count)
 {
     PHashMapSuite_Helper_FillHashMap (count);
-    PHashMapSuite_Helper_CheckSize (count);
+    SizeChecker (pHashMapHandle, PHashMap_AsISizedContainer (), count, 1);
 
     for (int index = 0; index < count * 2; ++index)
     {
@@ -66,7 +58,7 @@ static void PHashMapSuite_Helper_ContainsTest (uint count)
 static void PHashMapSuite_Helper_GetValueTest (uint count)
 {
     PHashMapSuite_Helper_FillHashMap (count);
-    PHashMapSuite_Helper_CheckSize (count);
+    SizeChecker (pHashMapHandle, PHashMap_AsISizedContainer (), count, 1);
 
     for (int index = 0; index < count; ++index)
     {
@@ -83,11 +75,11 @@ static void PHashMapSuite_Helper_GetValueTest (uint count)
 static void PHashMapSuite_Helper_EraseTest (uint count)
 {
     PHashMapSuite_Helper_FillHashMap (count);
-    PHashMapSuite_Helper_CheckSize (count);
+    SizeChecker (pHashMapHandle, PHashMap_AsISizedContainer (), count, 1);
 
     int index = count / 2;
     PHashMap_Erase (pHashMapHandle, &index, ContainerCallback_Free, ContainerCallback_Free);
-    PHashMapSuite_Helper_CheckSize (count - 1);
+    SizeChecker (pHashMapHandle, PHashMap_AsISizedContainer (), count - 1, 1);
 
     char expected = 0;
     char actual = PHashMap_ContainsKey (pHashMapHandle, &index);

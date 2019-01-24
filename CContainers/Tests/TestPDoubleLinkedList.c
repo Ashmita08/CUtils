@@ -6,88 +6,22 @@
 
 #include <CContainers/PDoubleLinkedList.h>
 #include <CContainers/Utils.h>
+#include "Utils.h"
 
 #define TEST_LIST_SIZE 10
 static PDoubleLinkedListHandle pDoubleLinkedListHandle;
 
-// TODO: Maybe use container interfaces to move all helpers to separate compile object?
-void PDoubleLinkedListSuite_Helper_CheckSize (uint size)
-{
-    if (size != PDoubleLinkedList_Size (pDoubleLinkedListHandle))
-    {
-        printf ("\n        Size (e/a): %d, %d.", size, (int) PDoubleLinkedList_Size (pDoubleLinkedListHandle));
-        CU_FAIL_FATAL ("Expected and actual values are not equal!");
-    }
-}
-
-static int CheckIterationOrderCallback_number = 0;
-
-void CheckIterationOrderAscendingCallback (void **item)
-{
-    int number = **((int **) item);
-    if (CheckIterationOrderCallback_number != number)
-    {
-        printf ("\nValue at %d (e/a): %d, %d.", CheckIterationOrderCallback_number,
-                CheckIterationOrderCallback_number, number);
-    }
-
-    ++CheckIterationOrderCallback_number;
-}
-
-void CheckIterationOrderDescendingCallback (void **item)
-{
-    int number = **((int **) item);
-    if (CheckIterationOrderCallback_number != number)
-    {
-        printf ("\nValue at %d (e/a): %d, %d.", CheckIterationOrderCallback_number,
-                CheckIterationOrderCallback_number, number);
-    }
-
-    --CheckIterationOrderCallback_number;
-}
-
-void PDoubleLinkedListSuite_Helper_IterateCheckNaturalOrdered ()
-{
-    CheckIterationOrderCallback_number = 0;
-    PDoubleLinkedListIterator_ForEach (PDoubleLinkedList_Begin (pDoubleLinkedListHandle),
-            PDoubleLinkedList_End (pDoubleLinkedListHandle),
-            CheckIterationOrderAscendingCallback);
-}
-
-void PDoubleLinkedListSuite_Helper_IterateCheckNaturalOrderedReversedForEach (uint size)
-{
-    CheckIterationOrderCallback_number = size - 1;
-    PDoubleLinkedListIterator_ForEachReversed (PDoubleLinkedList_Begin (pDoubleLinkedListHandle),
-            PDoubleLinkedListIterator_Previous (PDoubleLinkedList_End (pDoubleLinkedListHandle)),
-            CheckIterationOrderDescendingCallback);
-}
-
-void PDoubleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (uint size)
-{
-    for (uint index = 0; index < size; ++index)
-    {
-        PDoubleLinkedListIterator iterator = PDoubleLinkedList_At (pDoubleLinkedListHandle, index);
-        if (CContainers_GetLastError () != 0)
-        {
-            printf ("\n        CContainers internal error code: %d.\n", CContainers_GetLastError ());
-            CU_FAIL_FATAL ("CContainers internal error!");
-        }
-
-        int value = **((int **) PDoubleLinkedListIterator_ValueAt (iterator));
-        if (value != index)
-        {
-            printf ("\n        Value at %d (e/a): %d, %d.", index, index, value);
-            CU_FAIL ("Vector content is incorrect!");
-        }
-    }
-}
-
 void PDoubleLinkedListSuite_Helper_RunChecks (uint size)
 {
-    PDoubleLinkedListSuite_Helper_CheckSize (size);
-    PDoubleLinkedListSuite_Helper_IterateCheckNaturalOrdered ();
-    PDoubleLinkedListSuite_Helper_IterateCheckNaturalOrderedReversedForEach (size);
-    PDoubleLinkedListSuite_Helper_ItemAtCheckNaturalOrdered (size);
+    SizeChecker (pDoubleLinkedListHandle, PDoubleLinkedList_AsISizedContainer (), size, 1);
+    IterationNaturalOrderChecker (pDoubleLinkedListHandle,
+            PDoubleLinkedList_AsIIterableContainer (), PDoubleLinkedListIterator_AsIOneDirectionIterator (), 0);
+
+    IterationReversedNaturalOrderChecker (pDoubleLinkedListHandle, PDoubleLinkedList_AsISizedContainer (),
+            PDoubleLinkedList_AsIIterableContainer (), PDoubleLinkedListIterator_AsIBiDirectionalIterator (), 0);
+
+    ItemAtNaturalOrderChecker (pDoubleLinkedListHandle, PDoubleLinkedList_AsISizedContainer (),
+            PDoubleLinkedList_AsIIterableContainer (), PDoubleLinkedListIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PDoubleLinkedListSuite_Setup ()

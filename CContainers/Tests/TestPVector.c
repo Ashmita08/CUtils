@@ -6,58 +6,10 @@
 
 #include <CContainers/PVector.h>
 #include <CContainers/Utils.h>
+#include "Utils.h"
 
 #define INITIAL_CAPACITY 5
 PVectorHandle pVectorHandle;
-
-void PVectorSuite_Helper_CheckSize (uint size)
-{
-    if (size != PVector_Size (pVectorHandle))
-    {
-        printf ("\n        Size (e/a): %d, %d.", size, (int) PVector_Size (pVectorHandle));
-        CU_FAIL_FATAL ("Expected and actual values are not equal!");
-    }
-}
-
-void PVectorSuite_Helper_IterateCheckNaturalOrdered ()
-{
-    int number = 0;
-    PVectorIterator iterator = PVector_Begin (pVectorHandle);
-
-    while (iterator != PVector_End (pVectorHandle))
-    {
-        int value = **((int **) PVectorIterator_ValueAt (iterator));
-        if (value != number)
-        {
-            printf ("\n        Value at %d (e/a): %d, %d.", number, number,
-                    **((int **) PVectorIterator_ValueAt (iterator)));
-            CU_FAIL ("Vector content is incorrect!");
-        }
-
-        iterator = PVectorIterator_Next (iterator);
-        ++number;
-    }
-}
-
-void PVectorSuite_Helper_ItemAtCheckNaturalOrdered (int size)
-{
-    for (uint index = 0; index < size; ++index)
-    {
-        PVectorIterator iterator = PVector_At (pVectorHandle, index);
-        if (CContainers_GetLastError () != 0)
-        {
-            printf ("\n        CContainers internal error code: %d.\n", CContainers_GetLastError ());
-            CU_FAIL_FATAL ("CContainers internal error!");
-        }
-
-        int value = **((int **) PVectorIterator_ValueAt (iterator));
-        if (value != index)
-        {
-            printf ("\n        Value at %d (e/a): %d, %d.", index, index, value);
-            CU_FAIL ("Vector content is incorrect!");
-        }
-    }
-}
 
 void PVectorSuite_Helper_InsertBackAndIterate (uint size)
 {
@@ -74,9 +26,10 @@ void PVectorSuite_Helper_InsertBackAndIterate (uint size)
         }
     }
 
-    PVectorSuite_Helper_CheckSize (size);
-    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
-    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (size);
+    SizeChecker (pVectorHandle, PVector_AsISizedContainer (), size, 1);
+    IterationNaturalOrderChecker (pVectorHandle, PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
+    ItemAtNaturalOrderChecker (pVectorHandle, PVector_AsISizedContainer (),
+            PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PVectorSuite_Helper_InsertBeginAndIterate (uint size)
@@ -94,9 +47,10 @@ void PVectorSuite_Helper_InsertBeginAndIterate (uint size)
         }
     }
 
-    PVectorSuite_Helper_CheckSize (size);
-    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
-    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (size);
+    SizeChecker (pVectorHandle, PVector_AsISizedContainer (), size, 1);
+    IterationNaturalOrderChecker (pVectorHandle, PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
+    ItemAtNaturalOrderChecker (pVectorHandle, PVector_AsISizedContainer (),
+            PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PVectorSuite_Helper_InsertMiddleAndIterate (uint size)
@@ -141,9 +95,10 @@ void PVectorSuite_Helper_InsertMiddleAndIterate (uint size)
         nextIterator = PVectorIterator_Next (iterator);
     }
 
-    PVectorSuite_Helper_CheckSize (size);
-    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
-    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (size);
+    SizeChecker (pVectorHandle, PVector_AsISizedContainer (), size, 1);
+    IterationNaturalOrderChecker (pVectorHandle, PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
+    ItemAtNaturalOrderChecker (pVectorHandle, PVector_AsISizedContainer (),
+            PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PVectorSuite_Setup ()
@@ -217,9 +172,10 @@ void PVectorSuite_EraseBegin ()
     }
 
     PVector_Erase (pVectorHandle, PVector_Begin (pVectorHandle));
-    PVectorSuite_Helper_CheckSize (size - 1);
-    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
-    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (size - 1);
+    SizeChecker (pVectorHandle, PVector_AsISizedContainer (), size - 1, 1);
+    IterationNaturalOrderChecker (pVectorHandle, PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
+    ItemAtNaturalOrderChecker (pVectorHandle, PVector_AsISizedContainer (),
+            PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PVectorSuite_EraseEnd ()
@@ -239,9 +195,10 @@ void PVectorSuite_EraseEnd ()
     }
 
     PVector_Erase (pVectorHandle, PVectorIterator_Previous (PVector_End (pVectorHandle)));
-    PVectorSuite_Helper_CheckSize (size - 1);
-    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
-    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (size - 1);
+    SizeChecker (pVectorHandle, PVector_AsISizedContainer (), size - 1, 1);
+    IterationNaturalOrderChecker (pVectorHandle, PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
+    ItemAtNaturalOrderChecker (pVectorHandle, PVector_AsISizedContainer (),
+            PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
 }
 
 void PVectorSuite_EraseMiddle ()
@@ -273,9 +230,10 @@ void PVectorSuite_EraseMiddle ()
         }
     }
 
-    PVectorSuite_Helper_CheckSize (size / 2);
-    PVectorSuite_Helper_IterateCheckNaturalOrdered ();
-    PVectorSuite_Helper_ItemAtCheckNaturalOrdered (size / 2);
+    SizeChecker (pVectorHandle, PVector_AsISizedContainer (), size / 2, 1);
+    IterationNaturalOrderChecker (pVectorHandle, PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
+    ItemAtNaturalOrderChecker (pVectorHandle, PVector_AsISizedContainer (),
+            PVector_AsIIterableContainer (), PVectorIterator_AsIOneDirectionIterator (), 0);
 }
 
 void RegisterPVectorSuite ()
