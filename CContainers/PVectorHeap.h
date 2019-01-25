@@ -9,7 +9,7 @@ PVectorHeapHandle PVectorHeap_Create (ulint initialCapacity, lint (*Comparator) 
 /// Creates heap from given PVector. Given PVector would be captured and used as storage by created heap.
 PVectorHeapHandle PVectorHeap_Heapify (VirtualHandle vector, ISizedContainer *ISized,
         IIterableContainer *IIterable, IBiDirectionalIterator *IIterator, IMutableContainer *IMutable,
-        lint (*Comparator) (const void *first, const void *second));
+        lint (*Comparator) (const void *first, const void *second), char reverseComparator);
 
 void PVectorHeap_Destruct (PVectorHeapHandle handle,
         void (*BaseDestructor) (VirtualHandle vector, void (*DestructCallback) (void **item)),

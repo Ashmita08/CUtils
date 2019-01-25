@@ -100,7 +100,7 @@ static void PVectorHeapSuite_Heapify ()
 
     PVectorHeapHandle heap = PVectorHeap_Heapify (initialVector, PVector_AsISizedContainer (),
             PVector_AsIIterableContainer (), PVectorIterator_AsIBiDirectionalIterator (),
-            PVector_AsIMutableContainer (), PVectorHeapSuite_HeapComparator);
+            PVector_AsIMutableContainer (), PVectorHeapSuite_HeapComparator, 0);
 
     for (uint index = 0; index < TEST_HEAP_NUMBERS_COUNT / 2; index++)
     {
