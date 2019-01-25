@@ -19,7 +19,7 @@ IOrganizerContainer PVectorHeap_IOrganizerContainer =
 typedef struct
 {
     VirtualHandle vector;
-    ISizedContainer *ISized;
+    ulint size;
     IIterableContainer *IIterable;
     IBiDirectionalIterator *IIterator;
     IMutableContainer *IMutable;
@@ -30,7 +30,7 @@ static void PVectorHeap_SiftDown (PVectorHeap *heap, ulint elementIndex)
 {
     ulint leftChild = elementIndex * 2 + 1;
     ulint rightChild = elementIndex * 2 + 2;
-    ulint size = heap->ISized->Size (heap->vector);
+    ulint size = heap->size;
 
     if (rightChild > size)
     {
@@ -105,7 +105,7 @@ PVectorHeapHandle PVectorHeap_Create (ulint initialCapacity, lint (*Comparator) 
 {
     PVectorHeap *heap = malloc (sizeof (PVectorHeap));
     heap->vector = PVector_Create (initialCapacity);
-    heap->ISized = PVector_AsISizedContainer ();
+    heap->size = 0;
     heap->IIterable = PVector_AsIIterableContainer ();
     heap->IIterator = PVectorIterator_AsIBiDirectionalIterator ();
     heap->IMutable = PVector_AsIMutableContainer ();
@@ -119,13 +119,13 @@ PVectorHeapHandle PVectorHeap_Heapify (VirtualHandle vector, ISizedContainer *IS
 {
     PVectorHeap *heap = malloc (sizeof (PVectorHeap));
     heap->vector = vector;
-    heap->ISized = ISized;
+    heap->size = ISized->Size (vector);
     heap->IIterable = IIterable;
     heap->IIterator = IIterator;
     heap->IMutable = IMutable;
     heap->Comparator = Comparator;
 
-    ulint size = ISized->Size (heap->vector);
+    ulint size = heap->size;
     for (ulint index = size / 2; index < size; --index)
     {
         PVectorHeap_SiftDown (heap, index);
@@ -146,7 +146,7 @@ void PVectorHeap_Destruct (PVectorHeapHandle handle,
 ulint PVectorHeap_Size (PVectorHeapHandle handle)
 {
     PVectorHeap *heap = (PVectorHeap *) handle;
-    return heap->ISized->Size (heap->vector);
+    return heap->size;
 }
 
 const void *PVectorHeap_Top (PVectorHeapHandle handle)
@@ -171,14 +171,15 @@ void PVectorHeap_Pop (PVectorHeapHandle handle)
                 heap->IIterator->Previous (heap->IIterable->End (heap->vector)));
 
         heap->IMutable->Erase (heap->vector, heap->IIterator->Previous (heap->IIterable->End (heap->vector)));
-        PVectorHeap_SiftDown (heap, 0);
-    }
+        heap->size -= 1;
+        PVectorHeap_SiftDown (heap, 0);}
 }
 
 void PVectorHeap_Push (PVectorHeapHandle handle, void *value)
 {
     PVectorHeap *heap = (PVectorHeap *) handle;
     heap->IMutable->Insert (heap->vector, heap->IIterable->End (heap->vector), value);
+    heap->size += 1;
     PVectorHeap_SiftUp (heap, PVectorHeap_Size (handle) - 1);
 }
 
