@@ -19,6 +19,7 @@ ulint PVectorHeap_Size (PVectorHeapHandle handle);
 const void *PVectorHeap_Top (PVectorHeapHandle handle);
 void PVectorHeap_Pop (PVectorHeapHandle handle);
 void PVectorHeap_Push (PVectorHeapHandle handle, void *value);
+void PVectorHeap_ReverseComparator (PVectorHeapHandle handle);
 
 ISizedContainer *PVectorHeap_AsISizedContainer ();
 IOrganizerContainer *PVectorHeap_AsIOrganizerContainer ();

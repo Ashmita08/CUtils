@@ -24,6 +24,7 @@ typedef struct
     IBiDirectionalIterator *IIterator;
     IMutableContainer *IMutable;
     lint (*Comparator) (const void *first, const void *second);
+    char comparatorMultiplier;
 } PVectorHeap;
 
 static void PVectorHeap_SiftDown (PVectorHeap *heap, ulint elementIndex)
@@ -42,7 +43,7 @@ static void PVectorHeap_SiftDown (PVectorHeap *heap, ulint elementIndex)
 
     if (rightChild == size)
     {
-        if (heap->Comparator (*left, *current) > 0)
+        if (heap->Comparator (*left, *current) * heap->comparatorMultiplier > 0)
         {
             void *temp = *current;
             *current = *left;
@@ -55,7 +56,7 @@ static void PVectorHeap_SiftDown (PVectorHeap *heap, ulint elementIndex)
         void **better = NULL;
         ulint betterIndex;
 
-        if (heap->Comparator (*right, *left) > 0)
+        if (heap->Comparator (*right, *left) * heap->comparatorMultiplier > 0)
         {
             better = right;
             betterIndex = rightChild;
@@ -66,7 +67,7 @@ static void PVectorHeap_SiftDown (PVectorHeap *heap, ulint elementIndex)
             betterIndex = leftChild;
         }
 
-        if (heap->Comparator (*better, *current) > 0)
+        if (heap->Comparator (*better, *current) * heap->comparatorMultiplier > 0)
         {
             void *temp = *current;
             *current = *better;
@@ -92,7 +93,7 @@ static void PVectorHeap_SiftUp (PVectorHeap *heap, ulint elementIndex)
     void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));;
     void **parent = heap->IIterator->Value (heap->IIterable->At (heap->vector, parentIndex));;
 
-    if (heap->Comparator (*current, *parent) > 0)
+    if (heap->Comparator (*current, *parent) * heap->comparatorMultiplier > 0)
     {
         void *temp = *current;
         *current = *parent;
@@ -106,10 +107,13 @@ PVectorHeapHandle PVectorHeap_Create (ulint initialCapacity, lint (*Comparator) 
     PVectorHeap *heap = malloc (sizeof (PVectorHeap));
     heap->vector = PVector_Create (initialCapacity);
     heap->size = 0;
+
     heap->IIterable = PVector_AsIIterableContainer ();
     heap->IIterator = PVectorIterator_AsIBiDirectionalIterator ();
     heap->IMutable = PVector_AsIMutableContainer ();
+
     heap->Comparator = Comparator;
+    heap->comparatorMultiplier = 1;
     return (PVectorHandle) heap;
 }
 
@@ -120,10 +124,12 @@ PVectorHeapHandle PVectorHeap_Heapify (VirtualHandle vector, ISizedContainer *IS
     PVectorHeap *heap = malloc (sizeof (PVectorHeap));
     heap->vector = vector;
     heap->size = ISized->Size (vector);
+
     heap->IIterable = IIterable;
     heap->IIterator = IIterator;
     heap->IMutable = IMutable;
     heap->Comparator = Comparator;
+    heap->comparatorMultiplier = 1;
 
     ulint size = heap->size;
     for (ulint index = size / 2; index < size; --index)
@@ -181,6 +187,12 @@ void PVectorHeap_Push (PVectorHeapHandle handle, void *value)
     heap->IMutable->Insert (heap->vector, heap->IIterable->End (heap->vector), value);
     heap->size += 1;
     PVectorHeap_SiftUp (heap, PVectorHeap_Size (handle) - 1);
+}
+
+void PVectorHeap_ReverseComparator (PVectorHeapHandle handle)
+{
+    PVectorHeap *heap = (PVectorHeap *) handle;
+    heap->comparatorMultiplier *= -1;
 }
 
 ISizedContainer *PVectorHeap_AsISizedContainer ()
