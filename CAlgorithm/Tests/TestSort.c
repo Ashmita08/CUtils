@@ -37,7 +37,7 @@ static lint Comparator (const void *first, const void *second)
     return (lint) (*(const int *) second - *(const int *) first);
 }
 
-static void SortSuite_Helper_Test (uint size, int *input, int *expectedOutput)
+static void SortSuite_Helper_Test (uint size, int *input, const int *expectedOutput)
 {
     PVectorHandle vector = PVector_Create (size);
     for (uint index = 0; index < size; ++index)
@@ -46,7 +46,7 @@ static void SortSuite_Helper_Test (uint size, int *input, int *expectedOutput)
     }
 
     HeapSort (vector, PVector_AsISizedContainer (), PVector_AsIIterableContainer (),
-            PVectorIterator_AsIOneDirectionIterator (), Comparator);
+            PVectorIterator_AsIBiDirectionalIterator (), PVector_AsIMutableContainer (), Comparator);
 
     for (uint index = 0; index < size; ++index)
     {

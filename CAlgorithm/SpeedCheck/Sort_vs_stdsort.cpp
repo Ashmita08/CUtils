@@ -12,7 +12,7 @@ extern "C"
 }
 
 #define RAND_SEED 147312
-#define TEST_AMOUNT 1000000
+#define TEST_AMOUNT 2000000
 
 static lint Comparator (const void *first, const void *second)
 {
@@ -31,7 +31,7 @@ static clock_t Check_HeapSort ()
 
     clock_t begin = clock ();
     HeapSort (vector, PVector_AsISizedContainer (), PVector_AsIIterableContainer (),
-            PVectorIterator_AsIOneDirectionIterator (), Comparator);
+            PVectorIterator_AsIBiDirectionalIterator (), PVector_AsIMutableContainer (), Comparator);
 
     PVector_Destruct (vector, ContainerCallback_NoAction);
     return clock () - begin;
