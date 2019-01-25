@@ -35,76 +35,110 @@ char PVectorHeap_DoCompare (PVectorHeap *heap, const void *first, const void *se
 
 static void PVectorHeap_SiftDown (PVectorHeap *heap, ulint elementIndex)
 {
-    ulint leftChild = elementIndex * 2 + 1;
-    ulint rightChild = elementIndex * 2 + 2;
-    ulint size = heap->size;
-
-    if (rightChild > size)
+    if (elementIndex >= heap->size)
     {
         return;
     }
 
-    void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));
-    void **left = heap->IIterator->Value (heap->IIterable->At (heap->vector, leftChild));
+    char mustSift = 1;
+    void *valueToSift = *(heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex)));
 
-    if (rightChild == size)
+    while (mustSift)
     {
-        if (PVectorHeap_DoCompare (heap, *left, *current))
+        mustSift = 0;
+        ulint leftChild = elementIndex * 2 + 1;
+        ulint rightChild = elementIndex * 2 + 2;
+        ulint size = heap->size;
+
+        void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));
+        if (rightChild > size)
         {
-            void *temp = *current;
-            *current = *left;
-            *left = temp;
+            *current = valueToSift;
+            return;
         }
-    }
-    else
-    {
-        void **right = heap->IIterator->Value (heap->IIterable->At (heap->vector, rightChild));
-        void **better = NULL;
-        ulint betterIndex;
 
-        if (PVectorHeap_DoCompare (heap, *right, *left))
+
+        void **left = heap->IIterator->Value (heap->IIterable->At (heap->vector, leftChild));
+        if (rightChild == size)
         {
-            better = right;
-            betterIndex = rightChild;
+            if (PVectorHeap_DoCompare (heap, *left, valueToSift))
+            {
+                *current = *left;
+                *left = valueToSift;
+            }
+            else
+            {
+                *current = valueToSift;
+            }
         }
         else
         {
-            better = left;
-            betterIndex = leftChild;
-        }
+            void **right = heap->IIterator->Value (heap->IIterable->At (heap->vector, rightChild));
+            void **better = NULL;
+            ulint betterIndex;
 
-        if (PVectorHeap_DoCompare (heap, *better, *current))
-        {
-            void *temp = *current;
-            *current = *better;
-            *better = temp;
-            PVectorHeap_SiftDown (heap, betterIndex);
+            if (PVectorHeap_DoCompare (heap, *right, *left))
+            {
+                better = right;
+                betterIndex = rightChild;
+            }
+            else
+            {
+                better = left;
+                betterIndex = leftChild;
+            }
+
+            if (PVectorHeap_DoCompare (heap, *better, valueToSift))
+            {
+                *current = *better;
+                elementIndex = betterIndex;
+                mustSift = 1;
+            }
+            else
+            {
+                *current = valueToSift;
+            }
         }
     }
 }
 
 static void PVectorHeap_SiftUp (PVectorHeap *heap, ulint elementIndex)
 {
-    if (elementIndex == 0)
+    if (elementIndex >= heap->size)
     {
         return;
     }
 
-    ulint parentIndex = elementIndex / 2;
-    if (elementIndex % 2 == 0)
-    {
-        --parentIndex;
-    }
+    char mustSift = 1;
+    void *valueToSift = *(heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex)));
 
-    void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));;
-    void **parent = heap->IIterator->Value (heap->IIterable->At (heap->vector, parentIndex));;
-
-    if (PVectorHeap_DoCompare (heap, *current, *parent))
+    while (mustSift)
     {
-        void *temp = *current;
-        *current = *parent;
-        *parent = temp;
-        PVectorHeap_SiftUp (heap, parentIndex);
+        mustSift = 0;
+        void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));
+        if (elementIndex == 0)
+        {
+            *current = valueToSift;
+            return;
+        }
+
+        ulint parentIndex = elementIndex / 2;
+        if (elementIndex % 2 == 0)
+        {
+            --parentIndex;
+        }
+
+        void **parent = heap->IIterator->Value (heap->IIterable->At (heap->vector, parentIndex));
+        if (PVectorHeap_DoCompare (heap, valueToSift, *parent))
+        {
+            *current = *parent;
+            elementIndex = parentIndex;
+            mustSift = 1;
+        }
+        else
+        {
+            *current = valueToSift;
+        }
     }
 }
 
