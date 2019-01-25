@@ -54,10 +54,28 @@ static clock_t Check_stdsort ()
     return clock () - begin;
 }
 
+static clock_t Check_stdsortheap ()
+{
+    auto *vector = new std::vector <lint> ();
+    srand (RAND_SEED);
+
+    for (int index = 0; index < TEST_AMOUNT; ++index)
+    {
+        vector->push_back ((lint) rand ());
+    }
+
+    clock_t begin = clock ();
+    std::make_heap (vector->begin (), vector->end ());
+    std::sort_heap (vector->begin (), vector->end ());
+
+    delete vector;
+    return clock () - begin;
+}
+
 void Sort_vs_stdsort ()
 {
     printf ("Sort: amount of items -- %d.\n", TEST_AMOUNT);
-    // FIXME: Heap sort speed is too low. Maybe it is because of extensive copying?
     printf ("HeapSort: %dms.\n", (int) (Check_HeapSort () * 1000 / CLOCKS_PER_SEC));
     printf ("std::sort: %dms.\n", (int) (Check_stdsort () * 1000 / CLOCKS_PER_SEC));
+    printf ("std::sort_heap: %dms.\n", (int) (Check_stdsortheap () * 1000 / CLOCKS_PER_SEC));
 }
