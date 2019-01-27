@@ -1,5 +1,5 @@
 #ifndef __CUTILS_CCONTAINERS_TESTS_PVECTORHEAP_H__
 #define __CUTILS_CCONTAINERS_TESTS_PVECTORHEAP_H__
-void RegisterPVectorHeapSuite ();
+void RegisterPHeapSuite ();
 #endif // __CUTILS_CCONTAINERS_TESTS_PVECTORHEAP_H__
 

@@ -1,7 +1,7 @@
 #include "TestPVector.h"
 #include "TestPSingleLinkedList.h"
 #include "TestPDoubleLinkedList.h"
-#include "TestPVectorHeap.h"
+#include "TestPHeap.h"
 #include "TestPHashMap.h"
 
 #include <CUnit/CUnit.h>
@@ -12,7 +12,7 @@ int main (int argc, char **argv)
     RegisterPVectorSuite ();
     RegisterPSingleLinkedListSuite ();
     RegisterPDoubleLinkedListSuite ();
-    RegisterPVectorHeapSuite ();
+    RegisterPHeapSuite ();
     RegisterPHashMapSuite ();
     return CU_CI_RUN_SUITES ();
 }

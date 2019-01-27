@@ -1,7 +1,7 @@
 #include "Sort.h"
 #include <stdlib.h>
 #include <CContainers/PVector.h>
-#include <CContainers/PVectorHeap.h>
+#include <CContainers/PHeap.h>
 #include <CContainers/Utils.h>
 
 static VirtualHandle HeapSort_DummyErase (VirtualHandle container, VirtualHandle iterator)
@@ -20,14 +20,14 @@ void HeapSort (VirtualHandle container, ISizedContainer *ISized,
 {
     IMutableContainer ICustomMutable = *IMutable;
     ICustomMutable.Erase = HeapSort_DummyErase;
-    PVectorHeapHandle heap = PVectorHeap_Heapify (
+    PHeapHandle heap = PHeap_Heapify (
             container, ISized, IIterable, IIterator, &ICustomMutable, Comparator, 1);
 
     VirtualHandle iterator = IIterator->Previous (IIterable->End (container));
     do
     {
-        const void *value = PVectorHeap_Top (heap);
-        PVectorHeap_Pop (heap);
+        const void *value = PHeap_Top (heap);
+        PHeap_Pop (heap);
         // Const qualifier discarded not by mistake!
         *(IIterator->Value (iterator)) = value;
 
@@ -40,7 +40,7 @@ void HeapSort (VirtualHandle container, ISizedContainer *ISized,
     }
     while (1);
 
-    PVectorHeap_Destruct (heap, HeapSort_DummyDestruct, ContainerCallback_NoAction);
+    PHeap_Destruct (heap, HeapSort_DummyDestruct, ContainerCallback_NoAction);
 }
 
 void MergeSortedParts (VirtualHandle begin, VirtualHandle middle, VirtualHandle end,
