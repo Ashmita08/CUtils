@@ -44,56 +44,61 @@ void HeapSort (VirtualHandle container, ISizedContainer *ISized,
 }
 
 void MergeSortedParts (VirtualHandle begin, VirtualHandle middle, VirtualHandle end,
-        IOneDirectionIterator *IIterator, lint (*Comparator) (const void *first, const void *second))
+        ulint leftPartSize, ulint rightPartSize, IOneDirectionIterator *IIterator,
+        lint (*Comparator) (const void *first, const void *second))
 {
-#define MERGE_SORTED_PARTS_RESERVE_PART 32
-    PVectorHandle leftPart = PVector_Create (MERGE_SORTED_PARTS_RESERVE_PART);
-    PVectorHandle rightPart = PVector_Create (MERGE_SORTED_PARTS_RESERVE_PART);
+    void **leftPart = malloc (sizeof (void *) * leftPartSize);
+    void **rightPart = malloc (sizeof (void *) * rightPartSize);
 
     VirtualHandle iterator = begin;
+    ulint index = 0;
+
     while (iterator != middle)
     {
-        PVector_Insert (leftPart, PVector_End (leftPart), *IIterator->Value (iterator));
+        leftPart [index] = *IIterator->Value (iterator);
         iterator = IIterator->Next (iterator);
+        ++index;
     }
 
+    index = 0;
     while (iterator != end)
     {
-        PVector_Insert (rightPart, PVector_End (rightPart), *IIterator->Value (iterator));
+        rightPart [index] = *IIterator->Value (iterator);
         iterator = IIterator->Next (iterator);
+        ++index;
     }
 
     iterator = begin;
-    VirtualHandle leftIterator = PVector_Begin (leftPart);
-    VirtualHandle rightIterator = PVector_Begin (rightPart);
+    ulint leftPartIndex = 0;
+    ulint rightPartIndex = 0;
 
-    while (leftIterator != PVector_End (leftPart) || rightIterator != PVector_End (rightPart))
+    while (leftPartIndex < leftPartSize || rightPartIndex < rightPartSize)
     {
         void *best = NULL;
-        if (leftIterator == PVector_End (leftPart))
+        if (rightPartIndex >= rightPartSize)
         {
-            best = *PVectorIterator_ValueAt (rightIterator);
-            rightIterator = PVectorIterator_Next (rightIterator);
+            best = leftPart [leftPartIndex];
+            ++leftPartIndex;
         }
-        else if (rightIterator == PVector_End (rightPart))
+        else if (leftPartIndex >= leftPartSize)
         {
-            best = *PVectorIterator_ValueAt (leftIterator);
-            leftIterator = PVectorIterator_Next (leftIterator);
+            best = rightPart [rightPartIndex];
+            ++rightPartIndex;
         }
         else
         {
-            void *left = *PVectorIterator_ValueAt (leftIterator);
-            void *right = *PVectorIterator_ValueAt (rightIterator);
+            void *left = leftPart [leftPartIndex];
+            void *right = rightPart [rightPartIndex];
 
             if (Comparator (left, right) > 0)
             {
                 best = left;
-                leftIterator = PVectorIterator_Next (leftIterator);
+                ++leftPartIndex;
             }
             else
             {
                 best = right;
-                rightIterator = PVectorIterator_Next (rightIterator);
+                ++rightPartIndex;
             }
         }
 
@@ -101,8 +106,8 @@ void MergeSortedParts (VirtualHandle begin, VirtualHandle middle, VirtualHandle 
         iterator = IIterator->Next (iterator);
     }
 
-    PVector_Destruct (leftPart, ContainerCallback_NoAction);
-    PVector_Destruct (rightPart, ContainerCallback_NoAction);
+    free (leftPart);
+    free (rightPart);
 }
 
 void MergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IOneDirectionIterator *IIterator,
@@ -113,6 +118,6 @@ void MergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IOneDirectio
     {
         MergeSort (begin, middle, size / 2, IIterator, Comparator);
         MergeSort (middle, end, size - size / 2, IIterator, Comparator);
-        MergeSortedParts (begin, middle, end, IIterator, Comparator);
+        MergeSortedParts (begin, middle, end, size / 2, size - size / 2, IIterator, Comparator);
     }
 }

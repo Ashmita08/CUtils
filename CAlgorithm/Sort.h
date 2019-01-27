@@ -8,7 +8,9 @@ void HeapSort (VirtualHandle container, ISizedContainer *ISized,
         lint (*Comparator) (const void *first, const void *second));
 
 void MergeSortedParts (VirtualHandle begin, VirtualHandle middle, VirtualHandle end,
-        IOneDirectionIterator *IIterator, lint (*Comparator) (const void *first, const void *second));
+        ulint leftPartSize, ulint rightPartSize, IOneDirectionIterator *IIterator, 
+        lint (*Comparator) (const void *first, const void *second));
+
 void MergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IOneDirectionIterator *IIterator,
         lint (*Comparator) (const void *first, const void *second));
 
