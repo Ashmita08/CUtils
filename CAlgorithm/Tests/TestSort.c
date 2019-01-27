@@ -37,29 +37,49 @@ static lint Comparator (const void *first, const void *second)
     return (lint) (*(const int *) second - *(const int *) first);
 }
 
-static void SortSuite_Helper_Test (uint size, int *input, const int *expectedOutput)
+void SortSuite_Helper_FillVector (PVectorHandle vector, uint size, int *input)
 {
-    PVectorHandle vector = PVector_Create (size);
     for (uint index = 0; index < size; ++index)
     {
         PVector_Insert (vector, PVector_End (vector), input + index);
     }
+}
 
-    HeapSort (vector, PVector_AsISizedContainer (), PVector_AsIIterableContainer (),
-            PVectorIterator_AsIBiDirectionalIterator (), PVector_AsIMutableContainer (), Comparator);
-
+void SortSuite_Helper_CheckVector (PVectorHandle vector, uint size, const int *expectedOutput)
+{
     for (uint index = 0; index < size; ++index)
     {
         int actual = **(int **) PVectorIterator_ValueAt (PVector_At (vector, index));
         int expected = expectedOutput [index];
-        
+
         if (actual != expected)
         {
             printf ("\n    Error at index %d (e/a): %d, %d.", index, expected, actual);
             CU_FAIL ("Incorrect order found!");
         }
     }
+}
+static void SortSuite_Helper_HeapSortTest (uint size, int *input, const int *expectedOutput)
+{
+    PVectorHandle vector = PVector_Create (size);
+    SortSuite_Helper_FillVector (vector, size, input);
 
+    HeapSort (vector, PVector_AsISizedContainer (), PVector_AsIIterableContainer (),
+            PVectorIterator_AsIBiDirectionalIterator (), PVector_AsIMutableContainer (), Comparator);
+
+    SortSuite_Helper_CheckVector (vector, size, expectedOutput);
+    PVector_Destruct (vector, ContainerCallback_NoAction);
+}
+
+static void SortSuite_Helper_MergeSortTest (uint size, int *input, const int *expectedOutput)
+{
+    PVectorHandle vector = PVector_Create (size);
+    SortSuite_Helper_FillVector (vector, size, input);
+
+    MergeSort (PVector_Begin (vector), PVector_End (vector), PVector_Size (vector),
+            PVectorIterator_AsIOneDirectionIterator (), Comparator);
+
+    SortSuite_Helper_CheckVector (vector, size, expectedOutput);
     PVector_Destruct (vector, ContainerCallback_NoAction);
 }
 
@@ -73,43 +93,80 @@ static void SortSuite_Teardown ()
 
 }
 
-static void SortSuite_First ()
+static void SortSuite_HeapFirst ()
 {
-    SortSuite_Helper_Test (FIRST_TEST_SIZE, FirstTest_Input, FirstTest_Output);
+    SortSuite_Helper_HeapSortTest (FIRST_TEST_SIZE, FirstTest_Input, FirstTest_Output);
 }
 
-static void SortSuite_Second ()
+static void SortSuite_HeapSecond ()
 {
-    SortSuite_Helper_Test (SECOND_TEST_SIZE, SecondTest_Input, SecondTest_Output);
+    SortSuite_Helper_HeapSortTest (SECOND_TEST_SIZE, SecondTest_Input, SecondTest_Output);
 }
 
-static void SortSuite_Third ()
+static void SortSuite_HeapThird ()
 {
-    SortSuite_Helper_Test (THIRD_TEST_SIZE, ThirdTest_Input, ThirdTest_Output);
+    SortSuite_Helper_HeapSortTest (THIRD_TEST_SIZE, ThirdTest_Input, ThirdTest_Output);
 }
 
-static void SortSuite_Fourth ()
+static void SortSuite_HeapFourth ()
 {
-    SortSuite_Helper_Test (FOURTH_TEST_SIZE, FourthTest_Input, FourthTest_Output);
+    SortSuite_Helper_HeapSortTest (FOURTH_TEST_SIZE, FourthTest_Input, FourthTest_Output);
 }
 
-static void SortSuite_Fifth ()
+static void SortSuite_HeapFifth ()
 {
-    SortSuite_Helper_Test (FIFTH_TEST_SIZE, FifthTest_Input, FifthTest_Output);
+    SortSuite_Helper_HeapSortTest (FIFTH_TEST_SIZE, FifthTest_Input, FifthTest_Output);
 }
 
-static void SortSuite_Sixth ()
+static void SortSuite_HeapSixth ()
 {
-    SortSuite_Helper_Test (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
+    SortSuite_Helper_HeapSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
+}
+
+static void SortSuite_MergeFirst ()
+{
+    SortSuite_Helper_MergeSortTest (FIRST_TEST_SIZE, FirstTest_Input, FirstTest_Output);
+}
+
+static void SortSuite_MergeSecond ()
+{
+    SortSuite_Helper_MergeSortTest (SECOND_TEST_SIZE, SecondTest_Input, SecondTest_Output);
+}
+
+static void SortSuite_MergeThird ()
+{
+    SortSuite_Helper_MergeSortTest (THIRD_TEST_SIZE, ThirdTest_Input, ThirdTest_Output);
+}
+
+static void SortSuite_MergeFourth ()
+{
+    SortSuite_Helper_MergeSortTest (FOURTH_TEST_SIZE, FourthTest_Input, FourthTest_Output);
+}
+
+static void SortSuite_MergeFifth ()
+{
+    SortSuite_Helper_MergeSortTest (FIFTH_TEST_SIZE, FifthTest_Input, FifthTest_Output);
+}
+
+static void SortSuite_MergeSixth ()
+{
+    SortSuite_Helper_MergeSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
 }
 
 void RegisterSortSuite ()
 {
     CU_CI_DEFINE_SUITE ("Sort", NULL, NULL, SortSuite_Setup, SortSuite_Teardown);
-    CUNIT_CI_TEST (SortSuite_First);
-    CUNIT_CI_TEST (SortSuite_Second);
-    CUNIT_CI_TEST (SortSuite_Third);
-    CUNIT_CI_TEST (SortSuite_Fourth);
-    CUNIT_CI_TEST (SortSuite_Fifth);
-    CUNIT_CI_TEST (SortSuite_Sixth);
+    CUNIT_CI_TEST (SortSuite_HeapFirst);
+    CUNIT_CI_TEST (SortSuite_HeapSecond);
+    CUNIT_CI_TEST (SortSuite_HeapThird);
+    CUNIT_CI_TEST (SortSuite_HeapFourth);
+    CUNIT_CI_TEST (SortSuite_HeapFifth);
+    CUNIT_CI_TEST (SortSuite_HeapSixth);
+
+    CUNIT_CI_TEST (SortSuite_MergeFirst);
+    CUNIT_CI_TEST (SortSuite_MergeSecond);
+    CUNIT_CI_TEST (SortSuite_MergeThird);
+    CUNIT_CI_TEST (SortSuite_MergeFourth);
+    CUNIT_CI_TEST (SortSuite_MergeFifth);
+    CUNIT_CI_TEST (SortSuite_MergeSixth);
 }
