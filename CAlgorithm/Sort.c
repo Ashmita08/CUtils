@@ -1,6 +1,5 @@
 #include "Sort.h"
 #include <stdlib.h>
-#include <minmax.h>
 #include <CContainers/PVector.h>
 #include <CContainers/PHeap.h>
 #include <CContainers/Utils.h>
@@ -119,11 +118,21 @@ void MergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IOneDirectio
         VirtualHandle partitionBegin = begin;
         for (ulint partitionBeginIndex = 0; partitionBeginIndex < size - 1; partitionBeginIndex += subArraySize * 2)
         {
-            ulint partitionEndIndex = min (partitionBeginIndex + subArraySize * 2, size);
-            ulint actualPartitionSize = partitionEndIndex - partitionBeginIndex;
-            ulint leftSize = min (subArraySize, actualPartitionSize);
-            ulint rightSize = actualPartitionSize - leftSize;
+            ulint partitionEndIndex = partitionBeginIndex + subArraySize * 2;
+            if (partitionEndIndex > size)
+            {
+                partitionEndIndex = size;
+            }
 
+            ulint actualPartitionSize = partitionEndIndex - partitionBeginIndex;
+            ulint leftSize = subArraySize;
+
+            if (leftSize > actualPartitionSize)
+            {
+                continue;
+            }
+
+            ulint rightSize = actualPartitionSize - leftSize;
             VirtualHandle partitionMiddle = IIterator->Jump (partitionBegin, leftSize);
             VirtualHandle partitionEnd = IIterator->Jump (partitionMiddle, rightSize);
 
