@@ -19,7 +19,9 @@ PVectorIterator PVector_Insert (PVectorHandle handle, PVectorIterator where, voi
 PVectorIterator PVector_Erase (PVectorHandle handle, PVectorIterator iterator);
 
 PVectorIterator PVectorIterator_Next (PVectorIterator iterator);
+PVectorIterator PVectorIterator_Jump (PVectorIterator iterator, ulint distance);
 PVectorIterator PVectorIterator_Previous (PVectorIterator iterator);
+PVectorIterator PVectorIterator_JumpBack (PVectorIterator iterator, ulint distance);
 void **PVectorIterator_ValueAt (PVectorIterator iterator);
 
 IOneDirectionIterator *PVectorIterator_AsIOneDirectionIterator ();

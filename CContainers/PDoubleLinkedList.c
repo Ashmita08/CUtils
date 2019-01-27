@@ -6,13 +6,16 @@
 IOneDirectionIterator PDoubleLinkedListIterator_IOneDirectionIterator =
         {
                 PDoubleLinkedListIterator_Next,
+                PDoubleLinkedListIterator_Jump,
                 PDoubleLinkedListIterator_ValueAt
         };
 
 IBiDirectionalIterator PDoubleLinkedListIterator_IBiDirectionalIterator =
         {
                 PDoubleLinkedListIterator_Next,
+                PDoubleLinkedListIterator_Jump,
                 PDoubleLinkedListIterator_Previous,
+                PDoubleLinkedListIterator_JumpBack,
                 PDoubleLinkedListIterator_ValueAt
         };
 
@@ -105,13 +108,16 @@ PDoubleLinkedListIterator PDoubleLinkedList_At (PDoubleLinkedListHandle handle, 
         return NULL;
     }
 
-    PDoubleLinkedListIterator iterator = PDoubleLinkedList_Begin (handle);
-    while (index--)
+    if (index > list->size / 2)
     {
-        iterator = PDoubleLinkedListIterator_Next (iterator);
+        PDoubleLinkedListIterator iterator = PDoubleLinkedList_End (handle);
+        return PDoubleLinkedListIterator_JumpBack (iterator, list->size - index);
     }
-
-    return iterator;
+    else
+    {
+        PDoubleLinkedListIterator iterator = PDoubleLinkedList_Begin (handle);
+        return PDoubleLinkedListIterator_Jump (iterator, index);
+    }
 }
 
 PDoubleLinkedListIterator PDoubleLinkedList_Insert (PDoubleLinkedListHandle handle,
@@ -177,10 +183,30 @@ PDoubleLinkedListIterator PDoubleLinkedListIterator_Next (PDoubleLinkedListItera
     return (PDoubleLinkedListIterator) node->next;
 }
 
+PDoubleLinkedListIterator PDoubleLinkedListIterator_Jump (PDoubleLinkedListIterator iterator, ulint distance)
+{
+    while (iterator != NULL && distance--)
+    {
+        iterator = PDoubleLinkedListIterator_Next (iterator);
+    }
+
+    return iterator;
+}
+
 PDoubleLinkedListIterator PDoubleLinkedListIterator_Previous (PDoubleLinkedListIterator iterator)
 {
     PDoubleLinkedListNode *node = (PDoubleLinkedListNode *) iterator;
     return (PDoubleLinkedListIterator) node->previous;
+}
+
+PDoubleLinkedListIterator PDoubleLinkedListIterator_JumpBack (PDoubleLinkedListIterator iterator, ulint distance)
+{
+    while (iterator != NULL && distance--)
+    {
+        iterator = PDoubleLinkedListIterator_Previous (iterator);
+    }
+
+    return iterator;
 }
 
 void **PDoubleLinkedListIterator_ValueAt (PDoubleLinkedListIterator iterator)

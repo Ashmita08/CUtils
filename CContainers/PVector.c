@@ -10,13 +10,16 @@
 IOneDirectionIterator PVectorIterator_IOneDirectionIterator =
         {
             PVectorIterator_Next,
+            PVectorIterator_Jump,
             PVectorIterator_ValueAt
         };
 
 IBiDirectionalIterator PVectorIterator_IBiDirectionalIterator =
         {
                 PVectorIterator_Next,
+                PVectorIterator_Jump,
                 PVectorIterator_Previous,
+                PVectorIterator_JumpBack,
                 PVectorIterator_ValueAt
         };
 
@@ -101,7 +104,7 @@ PVectorIterator PVector_At (PVectorHandle handle, ulint index)
         return NULL;
     }
 
-    return (PVectorIterator) (vector->buffer + index);
+    return PVectorIterator_Jump ((PVectorIterator) vector->buffer, index);
 }
 
 PVectorIterator PVector_Insert (PVectorHandle handle, PVectorIterator where, void *value)
@@ -160,9 +163,19 @@ PVectorIterator PVectorIterator_Next (PVectorIterator iterator)
     return ++iterator;
 }
 
+PVectorIterator PVectorIterator_Jump (PVectorIterator iterator, ulint distance)
+{
+    return iterator + distance;
+}
+
 PVectorIterator PVectorIterator_Previous (PVectorIterator iterator)
 {
     return --iterator;
+}
+
+PVectorIterator PVectorIterator_JumpBack (PVectorIterator iterator, ulint distance)
+{
+    return iterator - distance;
 }
 
 void **PVectorIterator_ValueAt (PVectorIterator iterator)

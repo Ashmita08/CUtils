@@ -21,7 +21,9 @@ PDoubleLinkedListIterator PDoubleLinkedList_Erase (PDoubleLinkedListHandle handl
         PDoubleLinkedListIterator iterator);
 
 PDoubleLinkedListIterator PDoubleLinkedListIterator_Next (PDoubleLinkedListIterator iterator);
+PDoubleLinkedListIterator PDoubleLinkedListIterator_Jump (PDoubleLinkedListIterator iterator, ulint distance);
 PDoubleLinkedListIterator PDoubleLinkedListIterator_Previous (PDoubleLinkedListIterator iterator);
+PDoubleLinkedListIterator PDoubleLinkedListIterator_JumpBack (PDoubleLinkedListIterator iterator, ulint distance);
 void **PDoubleLinkedListIterator_ValueAt (PDoubleLinkedListIterator iterator);
 
 IOneDirectionIterator *PDoubleLinkedListIterator_AsIOneDirectionIterator ();

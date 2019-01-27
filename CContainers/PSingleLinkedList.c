@@ -6,6 +6,7 @@
 IOneDirectionIterator PSingleLinkedListIterator_IOneDirectionIterator =
         {
             PSingleLinkedListIterator_Next,
+            PSingleLinkedListIterator_Jump,
             PSingleLinkedListIterator_ValueAt
         };
 
@@ -112,12 +113,7 @@ PSingleLinkedListIterator PSingleLinkedList_At (PSingleLinkedListHandle handle, 
         return NULL;
     }
 
-    while (index--)
-    {
-        iterator = PSingleLinkedListIterator_Next (iterator);
-    }
-
-    return iterator;
+    return PSingleLinkedListIterator_Jump (iterator, index);
 }
 
 PSingleLinkedListIterator PSingleLinkedList_InsertAfter (PSingleLinkedListHandle handle,
@@ -204,6 +200,16 @@ PSingleLinkedListIterator PSingleLinkedListIterator_Next (PSingleLinkedListItera
 {
     PSingleLinkedListNode *node = (PSingleLinkedListNode *) iterator;
     return node->next;
+}
+
+PSingleLinkedListIterator PSingleLinkedListIterator_Jump (PSingleLinkedListIterator iterator, ulint distance)
+{
+    while (iterator != NULL && distance--)
+    {
+        iterator = PSingleLinkedListIterator_Next (iterator);
+    }
+    
+    return iterator;
 }
 
 void **PSingleLinkedListIterator_ValueAt (PSingleLinkedListIterator iterator)

@@ -24,6 +24,7 @@ PSingleLinkedListIterator PSingleLinkedList_EraseNext (PSingleLinkedListHandle h
         PSingleLinkedListIterator iterator);
 
 PSingleLinkedListIterator PSingleLinkedListIterator_Next (PSingleLinkedListIterator iterator);
+PSingleLinkedListIterator PSingleLinkedListIterator_Jump (PSingleLinkedListIterator iterator, ulint distance);
 void **PSingleLinkedListIterator_ValueAt (PSingleLinkedListIterator iterator);
 
 IOneDirectionIterator *PSingleLinkedListIterator_AsIOneDirectionIterator ();
