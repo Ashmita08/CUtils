@@ -101,7 +101,7 @@ PVectorHeapHandle PVectorHeap_Create (uint initialCapacity, lint (*Comparator) (
     PVectorHeap *heap = malloc (sizeof (PVectorHeap));
     heap->vector = PVector_Create (initialCapacity);
     heap->Comparator = Comparator;
-    return (PVectorHandle) heap;
+    return (PVectorHeapHandle) heap;
 }
 
 PVectorHeapHandle PVectorHeap_Heapify (PVectorHandle vectorHandle,
@@ -117,7 +117,7 @@ PVectorHeapHandle PVectorHeap_Heapify (PVectorHandle vectorHandle,
         PVectorHeap_SiftDown (heap, index);
     }
 
-    return (PVectorHandle) heap;
+    return (PVectorHeapHandle) heap;
 }
 
 void PVectorHeap_Destruct (PVectorHeapHandle handle, void (*DestructCallback) (void **item))

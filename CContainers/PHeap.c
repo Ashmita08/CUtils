@@ -35,110 +35,76 @@ char PHeap_DoCompare (PHeap *heap, const void *first, const void *second)
 
 static void PHeap_SiftDown (PHeap *heap, ulint elementIndex)
 {
-    if (elementIndex >= heap->size)
+    uint leftChild = elementIndex * 2 + 1;
+    uint rightChild = elementIndex * 2 + 2;
+    uint size = heap->size;
+
+    if (rightChild > size)
     {
         return;
     }
 
-    char mustSift = 1;
-    void *valueToSift = *(heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex)));
+    void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));
+    void **left = heap->IIterator->Value (heap->IIterable->At (heap->vector, leftChild));
 
-    while (mustSift)
+    if (rightChild == size)
     {
-        mustSift = 0;
-        ulint leftChild = elementIndex * 2 + 1;
-        ulint rightChild = elementIndex * 2 + 2;
-        ulint size = heap->size;
-
-        void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));
-        if (rightChild > size)
+        if (PHeap_DoCompare (heap, *left, *current))
         {
-            *current = valueToSift;
-            return;
+            void *temp = *current;
+            *current = *left;
+            *left = temp;
         }
+    }
+    else
+    {
+        void **right = heap->IIterator->Value (heap->IIterable->At (heap->vector, rightChild));
+        void **better = NULL;
+        uint betterIndex;
 
-
-        void **left = heap->IIterator->Value (heap->IIterable->At (heap->vector, leftChild));
-        if (rightChild == size)
+        if (PHeap_DoCompare (heap, *right, *left))
         {
-            if (PHeap_DoCompare (heap, *left, valueToSift))
-            {
-                *current = *left;
-                *left = valueToSift;
-            }
-            else
-            {
-                *current = valueToSift;
-            }
+            better = right;
+            betterIndex = rightChild;
         }
         else
         {
-            void **right = heap->IIterator->Value (heap->IIterable->At (heap->vector, rightChild));
-            void **better = NULL;
-            ulint betterIndex;
+            better = left;
+            betterIndex = leftChild;
+        }
 
-            if (PHeap_DoCompare (heap, *right, *left))
-            {
-                better = right;
-                betterIndex = rightChild;
-            }
-            else
-            {
-                better = left;
-                betterIndex = leftChild;
-            }
-
-            if (PHeap_DoCompare (heap, *better, valueToSift))
-            {
-                *current = *better;
-                elementIndex = betterIndex;
-                mustSift = 1;
-            }
-            else
-            {
-                *current = valueToSift;
-            }
+        if (PHeap_DoCompare (heap, *better, *current))
+        {
+            void *temp = *current;
+            *current = *better;
+            *better = temp;
+            PHeap_SiftDown (heap, betterIndex);
         }
     }
 }
 
 static void PHeap_SiftUp (PHeap *heap, ulint elementIndex)
 {
-    if (elementIndex >= heap->size)
+    if (elementIndex == 0)
     {
         return;
     }
 
-    char mustSift = 1;
-    void *valueToSift = *(heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex)));
-
-    while (mustSift)
+    uint parentIndex = elementIndex / 2;
+    if (elementIndex % 2 == 0)
     {
-        mustSift = 0;
-        void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));
-        if (elementIndex == 0)
-        {
-            *current = valueToSift;
-            return;
-        }
+        --parentIndex;
+    }
 
-        ulint parentIndex = elementIndex / 2;
-        if (elementIndex % 2 == 0)
-        {
-            --parentIndex;
-        }
+    void **current = heap->IIterator->Value (heap->IIterable->At (heap->vector, elementIndex));
+    void **parent = heap->IIterator->Value (heap->IIterable->At (heap->vector, parentIndex));
 
-        void **parent = heap->IIterator->Value (heap->IIterable->At (heap->vector, parentIndex));
-        if (PHeap_DoCompare (heap, valueToSift, *parent))
-        {
-            *current = *parent;
-            elementIndex = parentIndex;
-            mustSift = 1;
-        }
-        else
-        {
-            *current = valueToSift;
-        }
+    if (PHeap_DoCompare (heap, *current, *parent))
+    {
+        void *temp = *current;
+        *current = *parent;
+        *parent = temp;
+        PHeap_SiftUp (heap, parentIndex);
     }
 }
 
@@ -154,7 +120,7 @@ PHeapHandle PHeap_Create (ulint initialCapacity, lint (*Comparator) (const void 
 
     heap->Comparator = Comparator;
     heap->reverseComparator = 0;
-    return (PVectorHandle) heap;
+    return (PHeapHandle) heap;
 }
 
 PHeapHandle PHeap_Heapify (VirtualHandle vector, ISizedContainer *ISized,
@@ -177,7 +143,7 @@ PHeapHandle PHeap_Heapify (VirtualHandle vector, ISizedContainer *ISized,
         PHeap_SiftDown (heap, index);
     }
 
-    return (PVectorHandle) heap;
+    return (PHeapHandle) heap;
 }
 
 void PHeap_Destruct (PHeapHandle handle,
