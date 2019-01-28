@@ -5,14 +5,14 @@
 
 ISizedContainer PVectorHeap_ISizedContainer =
         {
-            PVectorHeap_Size
+                PVectorHeap_Size
         };
 
 IOrganizerContainer PVectorHeap_IOrganizerContainer =
         {
-            PVectorHeap_Push,
-            PVectorHeap_Top,
-            PVectorHeap_Pop
+                PVectorHeap_Push,
+                PVectorHeap_Top,
+                PVectorHeap_Pop
         };
 
 typedef struct
@@ -23,76 +23,111 @@ typedef struct
 
 static void PVectorHeap_SiftDown (PVectorHeap *heap, uint elementIndex)
 {
-    uint leftChild = elementIndex * 2 + 1;
-    uint rightChild = elementIndex * 2 + 2;
-    uint size = PVector_Size (heap->vector);
-
-    if (rightChild > size)
+    ulint size = PVector_Size (heap->vector);
+    if (elementIndex >= size)
     {
         return;
     }
 
-    void **current = PVectorIterator_ValueAt (PVector_At (heap->vector, elementIndex));
-    void **left = PVectorIterator_ValueAt (PVector_At (heap->vector, leftChild));
+    char mustSift = 1;
+    void *valueToSift = *PVectorIterator_ValueAt (PVector_At (heap->vector, elementIndex));
 
-    if (rightChild == size)
+    while (mustSift)
     {
-        if (heap->Comparator (*left, *current) > 0)
+        mustSift = 0;
+        ulint leftChild = elementIndex * 2 + 1;
+        ulint rightChild = elementIndex * 2 + 2;
+
+        void **current = PVectorIterator_ValueAt (PVector_At (heap->vector, elementIndex));
+        if (rightChild > size)
         {
-            void *temp = *current;
-            *current = *left;
-            *left = temp;
+            *current = valueToSift;
+            return;
         }
-    }
-    else
-    {
-        void **right = PVectorIterator_ValueAt (PVector_At (heap->vector, rightChild));
-        void **better = NULL;
-        uint betterIndex;
 
-        if (heap->Comparator (*right, *left) > 0)
+
+        void **left = PVectorIterator_ValueAt (PVector_At (heap->vector, leftChild));
+        if (rightChild == size)
         {
-            better = right;
-            betterIndex = rightChild;
+            if (heap->Comparator (*left, valueToSift) > 0)
+            {
+                *current = *left;
+                *left = valueToSift;
+            }
+            else
+            {
+                *current = valueToSift;
+            }
         }
         else
         {
-            better = left;
-            betterIndex = leftChild;
-        }
+            void **right = PVectorIterator_ValueAt (PVector_At (heap->vector, rightChild));
+            void **better = NULL;
+            ulint betterIndex;
 
-        if (heap->Comparator (*better, *current) > 0)
-        {
-            void *temp = *current;
-            *current = *better;
-            *better = temp;
-            PVectorHeap_SiftDown (heap, betterIndex);
+            if (heap->Comparator (*right, *left) > 0)
+            {
+                better = right;
+                betterIndex = rightChild;
+            }
+            else
+            {
+                better = left;
+                betterIndex = leftChild;
+            }
+
+            if (heap->Comparator (*better, valueToSift) > 0)
+            {
+                *current = *better;
+                elementIndex = betterIndex;
+                mustSift = 1;
+            }
+            else
+            {
+                *current = valueToSift;
+            }
         }
     }
 }
 
 static void PVectorHeap_SiftUp (PVectorHeap *heap, uint elementIndex)
 {
-    if (elementIndex == 0)
+    ulint size = PVector_Size (heap->vector);
+    if (elementIndex >= size)
     {
         return;
     }
 
-    uint parentIndex = elementIndex / 2;
-    if (elementIndex % 2 == 0)
-    {
-        --parentIndex;
-    }
+    char mustSift = 1;
+    void *valueToSift = *PVectorIterator_ValueAt (PVector_At (heap->vector, elementIndex));
 
-    void **current = PVectorIterator_ValueAt (PVector_At (heap->vector, elementIndex));
-    void **parent = PVectorIterator_ValueAt (PVector_At (heap->vector, parentIndex));
-
-    if (heap->Comparator (*current, *parent) > 0)
+    while (mustSift)
     {
-        void *temp = *current;
-        *current = *parent;
-        *parent = temp;
-        PVectorHeap_SiftUp (heap, parentIndex);
+        mustSift = 0;
+        void **current = PVectorIterator_ValueAt (PVector_At (heap->vector, elementIndex));
+        if (elementIndex == 0)
+        {
+            *current = valueToSift;
+            return;
+        }
+
+        ulint parentIndex = elementIndex / 2;
+        if (elementIndex % 2 == 0)
+        {
+            --parentIndex;
+        }
+
+        void **parent = PVectorIterator_ValueAt (PVector_At (heap->vector, parentIndex));
+        if (heap->Comparator (valueToSift, *parent) > 0)
+        {
+            *current = *parent;
+            elementIndex = parentIndex;
+            mustSift = 1;
+        }
+        else
+        {
+            *current = valueToSift;
+        }
     }
 }
 

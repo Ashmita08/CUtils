@@ -8,6 +8,8 @@ typedef void *VirtualHandle;
 typedef struct {
     /// Must be O(1).
     VirtualHandle (*Next) (VirtualHandle current);
+    /// Variable complexity: O(1) for vectors and O(Size) for lists.
+    VirtualHandle (*Jump) (VirtualHandle current, ulint distance);
     /// Must be O(1).
     void **(*Value) (VirtualHandle iterator);
 } IOneDirectionIterator;
@@ -15,8 +17,12 @@ typedef struct {
 typedef struct {
     /// Must be O(1).
     VirtualHandle (*Next) (VirtualHandle current);
+    /// Variable complexity: O(1) for vectors and O(Size) for lists.
+    VirtualHandle (*Jump) (VirtualHandle current, ulint distance);
     /// Must be O(1).
     VirtualHandle (*Previous) (VirtualHandle current);
+    /// Variable complexity: O(1) for vectors and O(Size) for lists.
+    VirtualHandle (*JumpBack) (VirtualHandle current, ulint distance);
     /// Must be O(1).
     void **(*Value) (VirtualHandle iterator);
 } IBiDirectionalIterator;

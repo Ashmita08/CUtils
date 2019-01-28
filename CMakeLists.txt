@@ -10,3 +10,4 @@ find_package (CUnit REQUIRED)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR} ${CUNIT_SDK}/include)
 add_subdirectory (CContainers)
+add_subdirectory (CAlgorithm)

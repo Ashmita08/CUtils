@@ -36,14 +36,9 @@ typedef struct
     lint (*KeyComparator) (void *first, void *second);
 } PHashMap;
 
-static void EmptyDeleteCallback (void **item)
-{
-
-}
-
 static void PHashMap_BucketDestroyCallbackKeepPairs (void **bucket)
 {
-    PVector_Destruct (*bucket, EmptyDeleteCallback);
+    PVector_Destruct (*bucket, ContainerCallback_NoAction);
 }
 
 static void PHashMap_BucketDestroyCallback (void **bucket)

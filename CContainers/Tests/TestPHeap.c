@@ -1,14 +1,15 @@
-#include "TestPVectorHeap.h"
+#include "TestPHeap.h"
 #include <stdlib.h>
 
 #include <CUnit/CUnit.h>
 #include <CUnit/CUnitCI.h>
 
-#include <CContainers/PVectorHeap.h>
+#include <CContainers/PHeap.h>
+#include <CContainers/PVector.h>
 #include <CContainers/Utils.h>
 
 #define TEST_HEAP_CAPACITY 10
-static PVectorHeapHandle pVectorHeapHandle;
+static PHeapHandle pHeapHandle;
 #define TEST_HEAP_NUMBERS_COUNT 20
 static int testNumbers [TEST_HEAP_NUMBERS_COUNT] = {
         10, 45, -13, 56, 12,
@@ -17,36 +18,36 @@ static int testNumbers [TEST_HEAP_NUMBERS_COUNT] = {
         34, 56, 89, 191, 205
         };
 
-static void PVectorHeapSuite_Helper_PushTestNumbers ()
+static void PHeapSuite_Helper_PushTestNumbers ()
 {
     for (uint index = 0; index  < TEST_HEAP_NUMBERS_COUNT; ++index)
     {
         int *new = malloc (sizeof (int));
         *new = testNumbers [index];
-        PVectorHeap_Push (pVectorHeapHandle, new);
+        PHeap_Push (pHeapHandle, new);
     }
 }
 
 /// Integer min heap comparator.
-static lint PVectorHeapSuite_HeapComparator (const void *first, const void *second)
+static lint PHeapSuite_HeapComparator (const void *first, const void *second)
 {
     return *((const int *) second) - *((const int *) first);
 }
 
-static void PVectorHeapSuite_Setup ()
+static void PHeapSuite_Setup ()
 {
-    pVectorHeapHandle = PVectorHeap_Create (TEST_HEAP_CAPACITY, PVectorHeapSuite_HeapComparator);
+    pHeapHandle = PHeap_Create (TEST_HEAP_CAPACITY, PHeapSuite_HeapComparator);
 }
 
-static void PVectorHeapSuite_Teardown ()
+static void PHeapSuite_Teardown ()
 {
-    PVectorHeap_Destruct (pVectorHeapHandle, ContainerCallback_Free);
+    PHeap_Destruct (pHeapHandle, PVector_Destruct, ContainerCallback_Free);
     CContainers_SetLastError (0);
 }
 
-static void PVectorHeapSuite_PushAndTop ()
+static void PHeapSuite_PushAndTop ()
 {
-    PVectorHeapSuite_Helper_PushTestNumbers ();
+    PHeapSuite_Helper_PushTestNumbers ();
     int min = testNumbers [0];
 
     for (uint index = 1; index  < TEST_HEAP_NUMBERS_COUNT; ++index)
@@ -57,7 +58,7 @@ static void PVectorHeapSuite_PushAndTop ()
         }
     }
 
-    int top = *((const int *) PVectorHeap_Top (pVectorHeapHandle));
+    int top = *((const int *) PHeap_Top (pHeapHandle));
     if (min != top)
     {
         printf ("\n    Top item (e/a): %d, %d.", min, top);
@@ -65,16 +66,16 @@ static void PVectorHeapSuite_PushAndTop ()
     }
 }
 
-static void PVectorHeapSuite_PushAndPopOrder ()
+static void PHeapSuite_PushAndPopOrder ()
 {
-    PVectorHeapSuite_Helper_PushTestNumbers ();
-    int border = *((const int *) PVectorHeap_Top (pVectorHeapHandle));
-    PVectorHeap_Pop (pVectorHeapHandle);
+    PHeapSuite_Helper_PushTestNumbers ();
+    int border = *((const int *) PHeap_Top (pHeapHandle));
+    PHeap_Pop (pHeapHandle);
 
-    while (PVectorHeap_Size (pVectorHeapHandle) > 0)
+    while (PHeap_Size (pHeapHandle) > 0)
     {
-        int next = *((const int *) PVectorHeap_Top (pVectorHeapHandle));
-        PVectorHeap_Pop (pVectorHeapHandle);
+        int next = *((const int *) PHeap_Top (pHeapHandle));
+        PHeap_Pop (pHeapHandle);
 
         if (next < border)
         {
@@ -87,7 +88,7 @@ static void PVectorHeapSuite_PushAndPopOrder ()
     }
 }
 
-static void PVectorHeapSuite_Heapify ()
+static void PHeapSuite_Heapify ()
 {
     PVectorHandle initialVector = PVector_Create (TEST_HEAP_NUMBERS_COUNT);
     for (uint index = 0; index < TEST_HEAP_NUMBERS_COUNT; ++index)
@@ -97,7 +98,10 @@ static void PVectorHeapSuite_Heapify ()
         PVector_Insert (initialVector, PVector_End (initialVector), new);
     }
 
-    PVectorHeapHandle heap = PVectorHeap_Heapify (initialVector, PVectorHeapSuite_HeapComparator);
+    PHeapHandle heap = PHeap_Heapify (initialVector, PVector_AsISizedContainer (),
+            PVector_AsIIterableContainer (), PVectorIterator_AsIBiDirectionalIterator (),
+            PVector_AsIMutableContainer (), PHeapSuite_HeapComparator, 0);
+
     for (uint index = 0; index < TEST_HEAP_NUMBERS_COUNT / 2; index++)
     {
         int value = **((int **) PVectorIterator_ValueAt (PVector_At (initialVector, index)));
@@ -125,13 +129,13 @@ static void PVectorHeapSuite_Heapify ()
         }
     }
     
-    PVectorHeap_Destruct (heap, ContainerCallback_Free);
+    PHeap_Destruct (heap, PVector_Destruct, ContainerCallback_Free);
 }
 
-void RegisterPVectorHeapSuite ()
+void RegisterPHeapSuite ()
 {
-    CU_CI_DEFINE_SUITE ("PVectorHeap", NULL, NULL, PVectorHeapSuite_Setup, PVectorHeapSuite_Teardown);
-    CUNIT_CI_TEST (PVectorHeapSuite_PushAndTop);
-    CUNIT_CI_TEST (PVectorHeapSuite_PushAndPopOrder);
-    CUNIT_CI_TEST (PVectorHeapSuite_Heapify);
+    CU_CI_DEFINE_SUITE ("PHeap", NULL, NULL, PHeapSuite_Setup, PHeapSuite_Teardown);
+    CUNIT_CI_TEST (PHeapSuite_PushAndTop);
+    CUNIT_CI_TEST (PHeapSuite_PushAndPopOrder);
+    CUNIT_CI_TEST (PHeapSuite_Heapify);
 }
