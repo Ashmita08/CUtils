@@ -295,13 +295,34 @@ VirtualHandle QuickSortPartition (VirtualHandle begin, VirtualHandle end, ulint 
 void QuickSort (VirtualHandle begin, VirtualHandle end, ulint size, IBiDirectionalIterator *IIterator,
         lint (*Comparator) (const void *first, const void *second))
 {
-    if (begin != end)
+    ulint *stack = malloc (sizeof (ulint) * size * 3);
+    ulint stackSize = 0;
+    stack [stackSize++] = begin;
+    stack [stackSize++] = end;
+    stack [stackSize++] = size;
+
+    while (stackSize > 0)
     {
+        size = stack [--stackSize];
+        end = stack [--stackSize];
+        begin = stack [--stackSize];
+
         ulint leftSize;
         ulint rightSize;
         VirtualHandle middle = QuickSortPartition (begin, end, size, IIterator, Comparator, &leftSize, &rightSize);
 
-        QuickSort (begin, middle, leftSize, IIterator, Comparator);
-        QuickSort (IIterator->Next (middle), end, rightSize, IIterator, Comparator);
+        if (leftSize > 0)
+        {
+            stack [stackSize++] = begin;
+            stack [stackSize++] = middle;
+            stack [stackSize++] = leftSize;
+        }
+        
+        if (rightSize > 0)
+        {
+            stack [stackSize++] = IIterator->Next (middle);
+            stack [stackSize++] = end;
+            stack [stackSize++] = rightSize;
+        }
     }
 }

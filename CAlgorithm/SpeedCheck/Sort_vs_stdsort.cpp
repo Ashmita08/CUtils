@@ -11,7 +11,7 @@ extern "C"
 #include <CContainers/Utils.h>
 }
 
-#define RAND_SEED 947821
+#define RAND_SEED 24315
 #define TEST_AMOUNT 2000000
 
 static lint Comparator (const void *first, const void *second)
