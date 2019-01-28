@@ -119,34 +119,61 @@ void InplaceMergeSortedParts (VirtualHandle begin, VirtualHandle middle, Virtual
         return;
     }
 
-    VirtualHandle leftIterator = IIterator->Previous (middle);
-    VirtualHandle rightIterator = middle;
-    ulint rotationSize = 0;
+    ulint size = leftPartSize < rightPartSize ? leftPartSize : rightPartSize;
+    ulint low = 0;
+    ulint high = size - 1;
+    ulint mid = 0;
 
-    while (Comparator (*IIterator->Value (rightIterator), *IIterator->Value (leftIterator)) > 0)
+    while (high < size)
     {
-        rotationSize += 2;
-        char endReached = leftIterator == begin;
-        leftIterator = IIterator->Previous (leftIterator);
-        rightIterator = IIterator->Next (rightIterator);
-
-        endReached = endReached || rightIterator == end;
-        if (endReached)
+        if (low > high)
         {
+            ulint rightIndex = high;
+            ulint leftIndex = leftPartSize - 1 - high;
+
+            VirtualHandle leftIterator = IIterator->Jump (begin, leftIndex);
+            VirtualHandle rightIterator = IIterator->Jump (middle, rightIndex);
+
+            if (Comparator (*IIterator->Value (leftIterator), *IIterator->Value (rightIterator)) >= 0)
+            {
+                mid = high;
+            }
+            else
+            {
+                mid = high + 1;
+            }
+
             break;
+        }
+
+        mid = low + (high - low) / 2;
+        ulint rightIndex = mid;
+        ulint leftIndex = leftPartSize - 1 - mid;
+
+        VirtualHandle leftIterator = IIterator->Jump (begin, leftIndex);
+        VirtualHandle rightIterator = IIterator->Jump (middle, rightIndex);
+
+        if (Comparator (*IIterator->Value (leftIterator), *IIterator->Value (rightIterator)) > 0)
+        {
+            high = mid - 1;
+        }
+        else
+        {
+            low = mid + 1;
         }
     }
 
+    ulint rotationSize = 2 * mid;
     if (rotationSize == 0)
     {
         return;
     }
 
-    VirtualHandle leftBegin = IIterator->Next (leftIterator);
-    VirtualHandle rightEnd = rightIterator;
+    VirtualHandle leftBegin = IIterator->Jump (begin, leftPartSize - mid);
+    VirtualHandle rightEnd = IIterator->Jump (middle, mid);
 
-    leftIterator = leftBegin;
-    rightIterator = middle;
+    VirtualHandle leftIterator = leftBegin;
+    VirtualHandle rightIterator = middle;
 
     while (leftIterator != middle)
     {
