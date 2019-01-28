@@ -95,6 +95,18 @@ static void SortSuite_Helper_InplaceMergeSortTest (uint size, int *input, const 
     PVector_Destruct (vector, ContainerCallback_NoAction);
 }
 
+static void SortSuite_Helper_QuickSortTest (uint size, int *input, const int *expectedOutput)
+{
+    PVectorHandle vector = PVector_Create (size);
+    SortSuite_Helper_FillVector (vector, size, input);
+
+    QuickSort (PVector_Begin (vector), PVector_End (vector), PVector_Size (vector),
+            PVectorIterator_AsIBiDirectionalIterator (), Comparator);
+
+    SortSuite_Helper_CheckVector (vector, size, expectedOutput);
+    PVector_Destruct (vector, ContainerCallback_NoAction);
+}
+
 static void SortSuite_Setup ()
 {
 
@@ -195,6 +207,36 @@ static void SortSuite_InplaceMergeSixth ()
     SortSuite_Helper_InplaceMergeSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
 }
 
+static void SortSuite_QuickFirst ()
+{
+    SortSuite_Helper_QuickSortTest (FIRST_TEST_SIZE, FirstTest_Input, FirstTest_Output);
+}
+
+static void SortSuite_QuickSecond ()
+{
+    SortSuite_Helper_QuickSortTest (SECOND_TEST_SIZE, SecondTest_Input, SecondTest_Output);
+}
+
+static void SortSuite_QuickThird ()
+{
+    SortSuite_Helper_QuickSortTest (THIRD_TEST_SIZE, ThirdTest_Input, ThirdTest_Output);
+}
+
+static void SortSuite_QuickFourth ()
+{
+    SortSuite_Helper_QuickSortTest (FOURTH_TEST_SIZE, FourthTest_Input, FourthTest_Output);
+}
+
+static void SortSuite_QuickFifth ()
+{
+    SortSuite_Helper_QuickSortTest (FIFTH_TEST_SIZE, FifthTest_Input, FifthTest_Output);
+}
+
+static void SortSuite_QuickSixth ()
+{
+    SortSuite_Helper_QuickSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
+}
+
 void RegisterSortSuite ()
 {
     CU_CI_DEFINE_SUITE ("Sort", NULL, NULL, SortSuite_Setup, SortSuite_Teardown);
@@ -218,4 +260,11 @@ void RegisterSortSuite ()
     CUNIT_CI_TEST (SortSuite_InplaceMergeFourth);
     CUNIT_CI_TEST (SortSuite_InplaceMergeFifth);
     CUNIT_CI_TEST (SortSuite_InplaceMergeSixth);
+
+    CUNIT_CI_TEST (SortSuite_QuickFirst);
+    CUNIT_CI_TEST (SortSuite_QuickSecond);
+    CUNIT_CI_TEST (SortSuite_QuickThird);
+    CUNIT_CI_TEST (SortSuite_QuickFourth);
+    CUNIT_CI_TEST (SortSuite_QuickFifth);
+    CUNIT_CI_TEST (SortSuite_QuickSixth);
 }

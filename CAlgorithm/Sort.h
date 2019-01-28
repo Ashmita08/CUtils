@@ -20,4 +20,8 @@ void MergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IOneDirectio
 void InplaceMergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IBiDirectionalIterator *IIterator,
         lint (*Comparator) (const void *first, const void *second));
 
+// TODO: Optimize.
+void QuickSort (VirtualHandle begin, VirtualHandle end, ulint size, IBiDirectionalIterator *IIterator,
+        lint (*Comparator) (const void *first, const void *second));
+
 #endif // __CUTILS_CALGORITHM_SORT_H__

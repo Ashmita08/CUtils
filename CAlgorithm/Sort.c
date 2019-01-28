@@ -257,3 +257,51 @@ void InplaceMergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IBiDi
 {
     MergeSortInternal (begin, end, size, IIterator, Comparator, 1);
 }
+
+VirtualHandle QuickSortPartition (VirtualHandle begin, VirtualHandle end, ulint size,
+        IBiDirectionalIterator *IIterator, lint (*Comparator) (const void *first, const void *second),
+        ulint *outputLeftSize, ulint *outputRightSize)
+{
+    VirtualHandle pivotIterator = IIterator->Previous (end);
+    void *pivot = *IIterator->Value (pivotIterator);
+    ulint nextSmallerIndex = 0;
+    VirtualHandle nextSmallerIterator = begin;
+    VirtualHandle iterator = begin;
+
+    while (iterator != pivotIterator)
+    {
+        void **value = IIterator->Value (iterator);
+        if (Comparator (*value, pivot) >= 0)
+        {
+            void *temp = *value;
+            *value = *IIterator->Value (nextSmallerIterator);
+            *IIterator->Value (nextSmallerIterator) = temp;
+
+            ++nextSmallerIndex;
+            nextSmallerIterator = IIterator->Next (nextSmallerIterator);
+        }
+
+        iterator = IIterator->Next (iterator);
+    }
+
+    *IIterator->Value (pivotIterator) = *IIterator->Value (nextSmallerIterator);
+    *IIterator->Value (nextSmallerIterator) = pivot;
+
+    *outputLeftSize = nextSmallerIndex;
+    *outputRightSize = size - 1 - nextSmallerIndex;
+    return nextSmallerIterator;
+}
+
+void QuickSort (VirtualHandle begin, VirtualHandle end, ulint size, IBiDirectionalIterator *IIterator,
+        lint (*Comparator) (const void *first, const void *second))
+{
+    if (begin != end)
+    {
+        ulint leftSize;
+        ulint rightSize;
+        VirtualHandle middle = QuickSortPartition (begin, end, size, IIterator, Comparator, &leftSize, &rightSize);
+
+        QuickSort (begin, middle, leftSize, IIterator, Comparator);
+        QuickSort (IIterator->Next (middle), end, rightSize, IIterator, Comparator);
+    }
+}
