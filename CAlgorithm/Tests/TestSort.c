@@ -83,6 +83,18 @@ static void SortSuite_Helper_MergeSortTest (uint size, int *input, const int *ex
     PVector_Destruct (vector, ContainerCallback_NoAction);
 }
 
+static void SortSuite_Helper_InplaceMergeSortTest (uint size, int *input, const int *expectedOutput)
+{
+    PVectorHandle vector = PVector_Create (size);
+    SortSuite_Helper_FillVector (vector, size, input);
+
+    InplaceMergeSort (PVector_Begin (vector), PVector_End (vector), PVector_Size (vector),
+            PVectorIterator_AsIBiDirectionalIterator (), Comparator);
+
+    SortSuite_Helper_CheckVector (vector, size, expectedOutput);
+    PVector_Destruct (vector, ContainerCallback_NoAction);
+}
+
 static void SortSuite_Setup ()
 {
 
@@ -153,6 +165,36 @@ static void SortSuite_MergeSixth ()
     SortSuite_Helper_MergeSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
 }
 
+static void SortSuite_InplaceMergeFirst ()
+{
+    SortSuite_Helper_InplaceMergeSortTest (FIRST_TEST_SIZE, FirstTest_Input, FirstTest_Output);
+}
+
+static void SortSuite_InplaceMergeSecond ()
+{
+    SortSuite_Helper_InplaceMergeSortTest (SECOND_TEST_SIZE, SecondTest_Input, SecondTest_Output);
+}
+
+static void SortSuite_InplaceMergeThird ()
+{
+    SortSuite_Helper_InplaceMergeSortTest (THIRD_TEST_SIZE, ThirdTest_Input, ThirdTest_Output);
+}
+
+static void SortSuite_InplaceMergeFourth ()
+{
+    SortSuite_Helper_InplaceMergeSortTest (FOURTH_TEST_SIZE, FourthTest_Input, FourthTest_Output);
+}
+
+static void SortSuite_InplaceMergeFifth ()
+{
+    SortSuite_Helper_InplaceMergeSortTest (FIFTH_TEST_SIZE, FifthTest_Input, FifthTest_Output);
+}
+
+static void SortSuite_InplaceMergeSixth ()
+{
+    SortSuite_Helper_InplaceMergeSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
+}
+
 void RegisterSortSuite ()
 {
     CU_CI_DEFINE_SUITE ("Sort", NULL, NULL, SortSuite_Setup, SortSuite_Teardown);
@@ -169,4 +211,11 @@ void RegisterSortSuite ()
     CUNIT_CI_TEST (SortSuite_MergeFourth);
     CUNIT_CI_TEST (SortSuite_MergeFifth);
     CUNIT_CI_TEST (SortSuite_MergeSixth);
+
+    CUNIT_CI_TEST (SortSuite_InplaceMergeFirst);
+    CUNIT_CI_TEST (SortSuite_InplaceMergeSecond);
+    CUNIT_CI_TEST (SortSuite_InplaceMergeThird);
+    CUNIT_CI_TEST (SortSuite_InplaceMergeFourth);
+    CUNIT_CI_TEST (SortSuite_InplaceMergeFifth);
+    CUNIT_CI_TEST (SortSuite_InplaceMergeSixth);
 }

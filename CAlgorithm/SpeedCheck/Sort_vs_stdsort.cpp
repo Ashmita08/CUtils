@@ -55,6 +55,24 @@ static clock_t Check_MergeSort ()
     return clock () - begin;
 }
 
+static clock_t Check_InplaceMergeSort ()
+{
+    PVectorHandle vector = PVector_Create (TEST_AMOUNT);
+    srand (RAND_SEED);
+
+    for (int index = 0; index < TEST_AMOUNT; ++index)
+    {
+        PVector_Insert (vector, PVector_End (vector), (void *) ((lint) rand ()));
+    }
+
+    clock_t begin = clock ();
+    InplaceMergeSort (PVector_Begin (vector), PVector_End (vector), PVector_Size (vector),
+            PVectorIterator_AsIBiDirectionalIterator (), Comparator);
+
+    PVector_Destruct (vector, ContainerCallback_NoAction);
+    return clock () - begin;
+}
+
 static clock_t Check_stdsort ()
 {
     auto *vector = new std::vector <lint> ();
@@ -95,6 +113,7 @@ void Sort_vs_stdsort ()
     printf ("Sort: amount of items -- %d.\n", TEST_AMOUNT);
     printf ("HeapSort: %dms.\n", (int) (Check_HeapSort () * 1000 / CLOCKS_PER_SEC));
     printf ("MergeSort: %dms.\n", (int) (Check_MergeSort () * 1000 / CLOCKS_PER_SEC));
+    printf ("InplaceMergeSort: %dms.\n", (int) (Check_InplaceMergeSort () * 1000 / CLOCKS_PER_SEC));
     printf ("std::sort: %dms.\n", (int) (Check_stdsort () * 1000 / CLOCKS_PER_SEC));
     printf ("std::sort_heap: %dms.\n", (int) (Check_stdsortheap () * 1000 / CLOCKS_PER_SEC));
 }

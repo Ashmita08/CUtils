@@ -110,9 +110,76 @@ void MergeSortedParts (VirtualHandle begin, VirtualHandle middle, VirtualHandle 
     free (rightPart);
 }
 
-void MergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IOneDirectionIterator *IIterator,
+void InplaceMergeSortedParts (VirtualHandle begin, VirtualHandle middle, VirtualHandle end,
+        ulint leftPartSize, ulint rightPartSize, IBiDirectionalIterator *IIterator,
         lint (*Comparator) (const void *first, const void *second))
 {
+    if (leftPartSize == 0 || rightPartSize == 0)
+    {
+        return;
+    }
+
+    VirtualHandle leftIterator = IIterator->Previous (middle);
+    VirtualHandle rightIterator = middle;
+    ulint rotationSize = 0;
+
+    while (Comparator (*IIterator->Value (rightIterator), *IIterator->Value (leftIterator)) > 0)
+    {
+        rotationSize += 2;
+        char endReached = leftIterator == begin;
+        leftIterator = IIterator->Previous (leftIterator);
+        rightIterator = IIterator->Next (rightIterator);
+
+        endReached = endReached || rightIterator == end;
+        if (endReached)
+        {
+            break;
+        }
+    }
+
+    if (rotationSize == 0)
+    {
+        return;
+    }
+
+    VirtualHandle leftBegin = IIterator->Next (leftIterator);
+    VirtualHandle rightEnd = rightIterator;
+
+    leftIterator = leftBegin;
+    rightIterator = middle;
+
+    while (leftIterator != middle)
+    {
+        void **left = IIterator->Value (leftIterator);
+        void **right = IIterator->Value (rightIterator);
+        void *temp = *left;
+
+        *left = *right;
+        *right = temp;
+
+        leftIterator = IIterator->Next (leftIterator);
+        rightIterator = IIterator->Next (rightIterator);
+    }
+
+    if (rotationSize / 2 != leftPartSize)
+    {
+        ulint nextLeftPartSize = leftPartSize - rotationSize / 2;
+        ulint nextRightPartSize = rotationSize / 2;
+        InplaceMergeSortedParts (begin, leftBegin, middle, nextLeftPartSize, nextRightPartSize, IIterator, Comparator);
+    }
+
+    if (rotationSize / 2 != rightPartSize)
+    {
+        ulint nextLeftPartSize = rotationSize / 2;
+        ulint nextRightPartSize = rightPartSize - rotationSize / 2;
+        InplaceMergeSortedParts (middle, rightEnd, end, nextLeftPartSize, nextRightPartSize, IIterator, Comparator);
+    }
+}
+
+void MergeSortInternal (VirtualHandle begin, VirtualHandle end, ulint size, IOneDirectionIterator *IIterator,
+        lint (*Comparator) (const void *first, const void *second), char inplace)
+{
+    // WARNING: Use only Next and Jump from IIterator interface!
     for (ulint subArraySize = 1; subArraySize < size; subArraySize *= 2)
     {
         VirtualHandle partitionBegin = begin;
@@ -136,10 +203,30 @@ void MergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IOneDirectio
             VirtualHandle partitionMiddle = IIterator->Jump (partitionBegin, leftSize);
             VirtualHandle partitionEnd = IIterator->Jump (partitionMiddle, rightSize);
 
-            MergeSortedParts (partitionBegin, partitionMiddle, partitionEnd,
-                    leftSize, rightSize, IIterator, Comparator);
+            if (inplace)
+            {
+                InplaceMergeSortedParts (partitionBegin, partitionMiddle, partitionEnd,
+                        leftSize, rightSize, IIterator, Comparator);
+            }
+            else
+            {
+                MergeSortedParts (partitionBegin, partitionMiddle, partitionEnd,
+                        leftSize, rightSize, IIterator, Comparator);
+            }
 
             partitionBegin = partitionEnd;
         }
     }
+}
+
+void MergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IOneDirectionIterator *IIterator,
+        lint (*Comparator) (const void *first, const void *second))
+{
+    MergeSortInternal (begin, end, size, IIterator, Comparator, 0);
+}
+
+void InplaceMergeSort (VirtualHandle begin, VirtualHandle end, ulint size, IBiDirectionalIterator *IIterator,
+        lint (*Comparator) (const void *first, const void *second))
+{
+    MergeSortInternal (begin, end, size, IIterator, Comparator, 1);
 }
