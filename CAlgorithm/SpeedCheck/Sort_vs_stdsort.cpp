@@ -115,6 +115,16 @@ static clock_t Check_stdsortheap ()
     return clock () - begin;
 }
 
+static clock_t Check_stdstablesort ()
+{
+    auto *vector = CreateStdVector ();
+    clock_t begin = clock ();
+    std::stable_sort (vector->begin (), vector->end ());
+
+    delete vector;
+    return clock () - begin;
+}
+
 void Sort_vs_stdsort ()
 {
     printf ("Sort: amount of items -- %d.\n", TEST_AMOUNT);
@@ -122,6 +132,8 @@ void Sort_vs_stdsort ()
     printf ("MergeSort: %dms.\n", (int) (Check_MergeSort () * 1000 / CLOCKS_PER_SEC));
     printf ("InplaceMergeSort: %dms.\n", (int) (Check_InplaceMergeSort () * 1000 / CLOCKS_PER_SEC));
     printf ("QuickSort: %dms.\n", (int) (Check_QuickSort () * 1000 / CLOCKS_PER_SEC));
+
     printf ("std::sort: %dms.\n", (int) (Check_stdsort () * 1000 / CLOCKS_PER_SEC));
     printf ("std::sort_heap: %dms.\n", (int) (Check_stdsortheap () * 1000 / CLOCKS_PER_SEC));
+    printf ("std::stable_sort: %dms.\n", (int) (Check_stdstablesort () * 1000 / CLOCKS_PER_SEC));
 }
