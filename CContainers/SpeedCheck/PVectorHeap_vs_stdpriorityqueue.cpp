@@ -12,7 +12,7 @@ extern "C"
 }
 
 #define SRAND_SEED 154632
-#define TEST_AMOUNT 10000000
+#define TEST_AMOUNT 1000000
 #define DEFAULT_INITIAL_CAPACITY 100
 
 static void EmptyDestruct (void **item)
@@ -36,6 +36,11 @@ static clock_t PVectorHeap_Insert (bool reserve)
         PVectorHeap_Push (heap, (void *) rand ());
     }
 
+    for (int index = 0; index < TEST_AMOUNT; ++index)
+    {
+        PVectorHeap_Pop (heap);
+    }
+
     PVectorHeap_Destruct (heap, EmptyDestruct);
     return clock () - begin;
 }
@@ -49,6 +54,11 @@ static clock_t stdpriorityqueue_Insert ()
     for (int index = 0; index < TEST_AMOUNT; ++index)
     {
         queue->push (rand ());
+    }
+
+    for (int index = 0; index < TEST_AMOUNT; ++index)
+    {
+        queue->pop ();
     }
 
     delete queue;
