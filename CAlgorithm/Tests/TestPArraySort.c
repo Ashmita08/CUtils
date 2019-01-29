@@ -97,6 +97,16 @@ static void PArraySortSuite_Helper_HeapSortTest (uint size, int *input, const in
     free (vector);
 }
 
+static void PArraySortSuite_Helper_QuickSortTest (uint size, int *input, const int *expectedOutput)
+{
+    void **vector = malloc (sizeof (void *) * size);
+    PArraySortSuite_Helper_FillVector (vector, size, input);
+    PArrayQuickSort (vector, vector + size, Comparator);
+
+    PArraySortSuite_Helper_CheckVector (vector, size, expectedOutput);
+    free (vector);
+}
+
 static void PArraySortSuite_Setup ()
 {
 
@@ -197,6 +207,36 @@ static void PArraySortSuite_HeapSixth ()
     PArraySortSuite_Helper_HeapSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
 }
 
+static void PArraySortSuite_QuickFirst ()
+{
+    PArraySortSuite_Helper_QuickSortTest (FIRST_TEST_SIZE, FirstTest_Input, FirstTest_Output);
+}
+
+static void PArraySortSuite_QuickSecond ()
+{
+    PArraySortSuite_Helper_QuickSortTest (SECOND_TEST_SIZE, SecondTest_Input, SecondTest_Output);
+}
+
+static void PArraySortSuite_QuickThird ()
+{
+    PArraySortSuite_Helper_QuickSortTest (THIRD_TEST_SIZE, ThirdTest_Input, ThirdTest_Output);
+}
+
+static void PArraySortSuite_QuickFourth ()
+{
+    PArraySortSuite_Helper_QuickSortTest (FOURTH_TEST_SIZE, FourthTest_Input, FourthTest_Output);
+}
+
+static void PArraySortSuite_QuickFifth ()
+{
+    PArraySortSuite_Helper_QuickSortTest (FIFTH_TEST_SIZE, FifthTest_Input, FifthTest_Output);
+}
+
+static void PArraySortSuite_QuickSixth ()
+{
+    PArraySortSuite_Helper_QuickSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
+}
+
 void RegisterPArraySortSuite ()
 {
     CU_CI_DEFINE_SUITE ("Sort", NULL, NULL, PArraySortSuite_Setup, PArraySortSuite_Teardown);
@@ -220,4 +260,11 @@ void RegisterPArraySortSuite ()
     CUNIT_CI_TEST (PArraySortSuite_HeapFourth);
     CUNIT_CI_TEST (PArraySortSuite_HeapFifth);
     CUNIT_CI_TEST (PArraySortSuite_HeapSixth);
+
+    CUNIT_CI_TEST (PArraySortSuite_QuickFirst);
+    CUNIT_CI_TEST (PArraySortSuite_QuickSecond);
+    CUNIT_CI_TEST (PArraySortSuite_QuickThird);
+    CUNIT_CI_TEST (PArraySortSuite_QuickFourth);
+    CUNIT_CI_TEST (PArraySortSuite_QuickFifth);
+    CUNIT_CI_TEST (PArraySortSuite_QuickSixth);
 }

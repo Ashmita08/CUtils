@@ -11,8 +11,8 @@ extern "C"
 #include <CContainers/Utils.h>
 }
 
-#define RAND_SEED 4543241
-#define TEST_AMOUNT 3000000
+#define RAND_SEED 23432
+#define TEST_AMOUNT 5000000
 
 static lint Comparator (const void *first, const void *second)
 {
@@ -58,6 +58,16 @@ static clock_t Check_HeapSort ()
     void **vector = CreateVector ();
     clock_t begin = clock ();
     PArrayHeapSort (vector, vector + TEST_AMOUNT, Comparator);
+
+    free (vector);
+    return clock () - begin;
+}
+
+static clock_t Check_QuickSort ()
+{
+    void **vector = CreateVector ();
+    clock_t begin = clock ();
+    PArrayQuickSort (vector, vector + TEST_AMOUNT, Comparator);
 
     free (vector);
     return clock () - begin;
@@ -114,6 +124,7 @@ void PArraySort_vs_stdsort ()
     printf ("PArrayMergeSort: %dms.\n", (int) (Check_MergeSort () * 1000 / CLOCKS_PER_SEC));
     printf ("PArrayInplaceMergeSort: %dms.\n", (int) (Check_InplaceMergeSort () * 1000 / CLOCKS_PER_SEC));
     printf ("PArrayHeapSort: %dms.\n", (int) (Check_HeapSort () * 1000 / CLOCKS_PER_SEC));
+    printf ("PArrayQuickSort: %dms.\n", (int) (Check_QuickSort () * 1000 / CLOCKS_PER_SEC));
 
     printf ("std::sort: %dms.\n", (int) (Check_stdsort () * 1000 / CLOCKS_PER_SEC));
     printf ("std::sort_heap: %dms.\n", (int) (Check_stdsortheap () * 1000 / CLOCKS_PER_SEC));

@@ -286,3 +286,57 @@ void PArrayInplaceMergeSort (void **begin, void **end, lint (*Comparator) (const
 {
     PArrayMergeSortInternal (begin, end, Comparator, PArrayInplaceMergeSortedParts);
 }
+
+void **PArrayQuickSortPartition (void **begin, void **end, lint (*Comparator) (const void *first, const void *second))
+{
+    void **pivotIterator = end - 1;
+    void *pivot = *pivotIterator;
+    void **nextSmallerIterator = begin;
+    void **iterator = begin;
+
+    while (iterator != pivotIterator)
+    {
+        void *value = *iterator;
+        if (Comparator (value, pivot) >= 0)
+        {
+            *iterator = *nextSmallerIterator;
+            *nextSmallerIterator = value;
+            ++nextSmallerIterator;
+        }
+
+        ++iterator;
+    }
+
+    *pivotIterator = *nextSmallerIterator;
+    *nextSmallerIterator = pivot;
+    return nextSmallerIterator;
+}
+
+void PArrayQuickSort (void **begin, void **end, lint (*Comparator) (const void *first, const void *second))
+{
+    ulint size = end - begin;
+    void ***stack = malloc (sizeof (ulint) * size * 2);
+
+    ulint stackSize = 0;
+    stack [stackSize++] = begin;
+    stack [stackSize++] = end;
+
+    while (stackSize > 0)
+    {
+        end = stack [--stackSize];
+        begin = stack [--stackSize];
+        void **middle = PArrayQuickSortPartition (begin, end, Comparator);
+
+        if (begin < middle)
+        {
+            stack [stackSize++] = begin;
+            stack [stackSize++] = middle;
+        }
+
+        if (middle + 1 < end)
+        {
+            stack [stackSize++] = middle + 1;
+            stack [stackSize++] = end;
+        }
+    }
+}
