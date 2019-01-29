@@ -73,7 +73,91 @@ void PArrayMergeSortedParts (void **begin, void **middle, void **end,
     free (rightPart);
 }
 
-void PArrayMergeSort (void **begin, void **end, lint (*Comparator) (const void *first, const void *second))
+void PArrayInplaceMergeSortedParts (void **begin, void **middle, void **end,
+        lint (*Comparator) (const void *first, const void *second))
+{
+    ulint leftPartSize = middle - begin;
+    ulint rightPartSize = end - middle;
+    
+    if (leftPartSize == 0 || rightPartSize == 0)
+    {
+        return;
+    }
+
+    ulint size = leftPartSize < rightPartSize ? leftPartSize : rightPartSize;
+    ulint low = 0;
+    ulint high = size - 1;
+    ulint mid = 0;
+
+    while (high < size)
+    {
+        if (low > high)
+        {
+            ulint rightIndex = high;
+            ulint leftIndex = leftPartSize - 1 - high;
+
+            if (Comparator (begin [leftIndex], middle [rightIndex]) >= 0)
+            {
+                mid = high;
+            }
+            else
+            {
+                mid = high + 1;
+            }
+
+            break;
+        }
+
+        mid = low + (high - low) / 2;
+        ulint rightIndex = mid;
+        ulint leftIndex = leftPartSize - 1 - mid;
+        
+        if (Comparator (begin [leftIndex], middle [rightIndex]) > 0)
+        {
+            high = mid - 1;
+        }
+        else
+        {
+            low = mid + 1;
+        }
+    }
+
+    ulint rotationSize = 2 * mid;
+    if (rotationSize == 0)
+    {
+        return;
+    }
+
+    void **leftBegin = begin + (leftPartSize - mid);
+    void **rightEnd = end + mid;
+
+    void **leftIterator = leftBegin;
+    void **rightIterator = middle;
+
+    while (leftIterator != middle)
+    {
+        void *temp = *leftIterator;
+        *leftIterator = *rightIterator;
+        *rightIterator = temp;
+
+        ++leftIterator;
+        ++rightIterator;
+    }
+
+    if (rotationSize / 2 != leftPartSize)
+    {
+        PArrayInplaceMergeSortedParts (begin, leftBegin, middle, Comparator);
+    }
+
+    if (rotationSize / 2 != rightPartSize)
+    {
+        PArrayInplaceMergeSortedParts (middle, rightEnd, end, Comparator);
+    }
+}
+
+void PArrayMergeSortInternal (void **begin, void **end, lint (*Comparator) (const void *first, const void *second),
+        void (*Merge) (void **begin, void **middle, void **end, 
+                lint (*Comparator) (const void *first, const void *second)))
 {
     ulint size = end - begin;
     for (ulint subArraySize = 1; subArraySize < size; subArraySize *= 2)
@@ -103,4 +187,14 @@ void PArrayMergeSort (void **begin, void **end, lint (*Comparator) (const void *
             partitionBegin = partitionEnd;
         }
     }
+}
+
+void PArrayMergeSort (void **begin, void **end, lint (*Comparator) (const void *first, const void *second))
+{
+    PArrayMergeSortInternal (begin, end, Comparator, PArrayMergeSortedParts);
+}
+
+void PArrayInplaceMergeSort (void **begin, void **end, lint (*Comparator) (const void *first, const void *second))
+{
+    PArrayMergeSortInternal (begin, end, Comparator, PArrayInplaceMergeSortedParts);
 }

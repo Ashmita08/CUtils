@@ -76,6 +76,16 @@ static void PArraySortSuite_Helper_MergeSortTest (uint size, int *input, const i
     free (vector);
 }
 
+static void PArraySortSuite_Helper_InplaceMergeSortTest (uint size, int *input, const int *expectedOutput)
+{
+    void **vector = malloc (sizeof (void *) * size);
+    PArraySortSuite_Helper_FillVector (vector, size, input);
+    PArrayInplaceMergeSort (vector, vector + size, Comparator);
+
+    PArraySortSuite_Helper_CheckVector (vector, size, expectedOutput);
+    free (vector);
+}
+
 static void PArraySortSuite_Setup ()
 {
 
@@ -116,6 +126,36 @@ static void PArraySortSuite_MergeSixth ()
     PArraySortSuite_Helper_MergeSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
 }
 
+static void PArraySortSuite_InplaceMergeFirst ()
+{
+    PArraySortSuite_Helper_InplaceMergeSortTest (FIRST_TEST_SIZE, FirstTest_Input, FirstTest_Output);
+}
+
+static void PArraySortSuite_InplaceMergeSecond ()
+{
+    PArraySortSuite_Helper_InplaceMergeSortTest (SECOND_TEST_SIZE, SecondTest_Input, SecondTest_Output);
+}
+
+static void PArraySortSuite_InplaceMergeThird ()
+{
+    PArraySortSuite_Helper_InplaceMergeSortTest (THIRD_TEST_SIZE, ThirdTest_Input, ThirdTest_Output);
+}
+
+static void PArraySortSuite_InplaceMergeFourth ()
+{
+    PArraySortSuite_Helper_InplaceMergeSortTest (FOURTH_TEST_SIZE, FourthTest_Input, FourthTest_Output);
+}
+
+static void PArraySortSuite_InplaceMergeFifth ()
+{
+    PArraySortSuite_Helper_InplaceMergeSortTest (FIFTH_TEST_SIZE, FifthTest_Input, FifthTest_Output);
+}
+
+static void PArraySortSuite_InplaceMergeSixth ()
+{
+    PArraySortSuite_Helper_InplaceMergeSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
+}
+
 void RegisterPArraySortSuite ()
 {
     CU_CI_DEFINE_SUITE ("Sort", NULL, NULL, PArraySortSuite_Setup, PArraySortSuite_Teardown);
@@ -125,4 +165,11 @@ void RegisterPArraySortSuite ()
     CUNIT_CI_TEST (PArraySortSuite_MergeFourth);
     CUNIT_CI_TEST (PArraySortSuite_MergeFifth);
     CUNIT_CI_TEST (PArraySortSuite_MergeSixth);
+
+    CUNIT_CI_TEST (PArraySortSuite_InplaceMergeFirst);
+    CUNIT_CI_TEST (PArraySortSuite_InplaceMergeSecond);
+    CUNIT_CI_TEST (PArraySortSuite_InplaceMergeThird);
+    CUNIT_CI_TEST (PArraySortSuite_InplaceMergeFourth);
+    CUNIT_CI_TEST (PArraySortSuite_InplaceMergeFifth);
+    CUNIT_CI_TEST (PArraySortSuite_InplaceMergeSixth);
 }
