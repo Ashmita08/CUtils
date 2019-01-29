@@ -107,6 +107,18 @@ static void SortSuite_Helper_QuickSortTest (uint size, int *input, const int *ex
     PVector_Destruct (vector, ContainerCallback_NoAction);
 }
 
+static void SortSuite_Helper_IntroSortTest (uint size, int *input, const int *expectedOutput)
+{
+    PVectorHandle vector = PVector_Create (size);
+    SortSuite_Helper_FillVector (vector, size, input);
+
+    IntroSort (PVector_Begin (vector), PVector_End (vector), PVector_Size (vector),
+            PVectorIterator_AsIBiDirectionalIterator (), Comparator);
+
+    SortSuite_Helper_CheckVector (vector, size, expectedOutput);
+    PVector_Destruct (vector, ContainerCallback_NoAction);
+}
+
 static void SortSuite_Setup ()
 {
 
@@ -237,6 +249,36 @@ static void SortSuite_QuickSixth ()
     SortSuite_Helper_QuickSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
 }
 
+static void SortSuite_IntroFirst ()
+{
+    SortSuite_Helper_IntroSortTest (FIRST_TEST_SIZE, FirstTest_Input, FirstTest_Output);
+}
+
+static void SortSuite_IntroSecond ()
+{
+    SortSuite_Helper_IntroSortTest (SECOND_TEST_SIZE, SecondTest_Input, SecondTest_Output);
+}
+
+static void SortSuite_IntroThird ()
+{
+    SortSuite_Helper_IntroSortTest (THIRD_TEST_SIZE, ThirdTest_Input, ThirdTest_Output);
+}
+
+static void SortSuite_IntroFourth ()
+{
+    SortSuite_Helper_IntroSortTest (FOURTH_TEST_SIZE, FourthTest_Input, FourthTest_Output);
+}
+
+static void SortSuite_IntroFifth ()
+{
+    SortSuite_Helper_IntroSortTest (FIFTH_TEST_SIZE, FifthTest_Input, FifthTest_Output);
+}
+
+static void SortSuite_IntroSixth ()
+{
+    SortSuite_Helper_IntroSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
+}
+
 void RegisterSortSuite ()
 {
     CU_CI_DEFINE_SUITE ("Sort", NULL, NULL, SortSuite_Setup, SortSuite_Teardown);
@@ -267,4 +309,11 @@ void RegisterSortSuite ()
     CUNIT_CI_TEST (SortSuite_QuickFourth);
     CUNIT_CI_TEST (SortSuite_QuickFifth);
     CUNIT_CI_TEST (SortSuite_QuickSixth);
+
+    CUNIT_CI_TEST (SortSuite_IntroFirst);
+    CUNIT_CI_TEST (SortSuite_IntroSecond);
+    CUNIT_CI_TEST (SortSuite_IntroThird);
+    CUNIT_CI_TEST (SortSuite_IntroFourth);
+    CUNIT_CI_TEST (SortSuite_IntroFifth);
+    CUNIT_CI_TEST (SortSuite_IntroSixth);
 }

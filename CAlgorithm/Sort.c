@@ -1,5 +1,7 @@
 #include "Sort.h"
 #include <stdlib.h>
+#include <math.h>
+
 #include <CContainers/PVector.h>
 #include <CContainers/PHeap.h>
 #include <CContainers/Utils.h>
@@ -325,4 +327,37 @@ void QuickSort (VirtualHandle begin, VirtualHandle end, ulint size, IBiDirection
             stack [stackSize++] = rightSize;
         }
     }
+}
+
+void IntroSortInternal (VirtualHandle begin, VirtualHandle end, ulint size, ulint depthLimit,
+        IBiDirectionalIterator *IIterator, lint (*Comparator) (const void *first, const void *second))
+{
+    if (depthLimit == 0)
+    {
+        // FIXME: HeapSort.
+        InplaceMergeSort (begin, end, size, IIterator, Comparator);
+    }
+    else
+    {
+        ulint leftSize;
+        ulint rightSize;
+        VirtualHandle middle = QuickSortPartition (begin, end, size, IIterator, Comparator, &leftSize, &rightSize);
+        
+        if (leftSize > 0)
+        {
+            IntroSortInternal (begin, middle, leftSize, depthLimit - 1, IIterator, Comparator);
+        }
+
+        if (rightSize > 0)
+        {
+            IntroSortInternal (IIterator->Next (middle), end, rightSize, depthLimit - 1, IIterator, Comparator);
+        }
+    }
+}
+
+void IntroSort (VirtualHandle begin, VirtualHandle end, ulint size, IBiDirectionalIterator *IIterator,
+        lint (*Comparator) (const void *first, const void *second))
+{
+    ulint depthLimit = (ulint) log (size);
+    IntroSortInternal (begin, end, size, depthLimit, IIterator, Comparator);
 }

@@ -80,6 +80,18 @@ static clock_t Check_QuickSort ()
     return clock () - begin;
 }
 
+static clock_t Check_IntroSort ()
+{
+    PVectorHandle vector = CreateVector ();
+    clock_t begin = clock ();
+
+    IntroSort (PVector_Begin (vector), PVector_End (vector), PVector_Size (vector),
+            PVectorIterator_AsIBiDirectionalIterator (), Comparator);
+
+    PVector_Destruct (vector, ContainerCallback_NoAction);
+    return clock () - begin;
+}
+
 static std::vector <lint> *CreateStdVector ()
 {
     auto *vector = new std::vector <lint> ();
@@ -132,6 +144,7 @@ void Sort_vs_stdsort ()
     printf ("MergeSort: %dms.\n", (int) (Check_MergeSort () * 1000 / CLOCKS_PER_SEC));
     printf ("InplaceMergeSort: %dms.\n", (int) (Check_InplaceMergeSort () * 1000 / CLOCKS_PER_SEC));
     printf ("QuickSort: %dms.\n", (int) (Check_QuickSort () * 1000 / CLOCKS_PER_SEC));
+    printf ("IntroSort: %dms.\n", (int) (Check_IntroSort () * 1000 / CLOCKS_PER_SEC));
 
     printf ("std::sort: %dms.\n", (int) (Check_stdsort () * 1000 / CLOCKS_PER_SEC));
     printf ("std::sort_heap: %dms.\n", (int) (Check_stdsortheap () * 1000 / CLOCKS_PER_SEC));
