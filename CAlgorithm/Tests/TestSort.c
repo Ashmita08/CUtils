@@ -9,28 +9,28 @@
 #include <CContainers/Utils.h>
 
 #define FIRST_TEST_SIZE 7
-int FirstTest_Input [] = {1, 2, 3, 4, 5, 6, 7};
-int FirstTest_Output [] = {1, 2, 3, 4, 5, 6, 7};
+static int FirstTest_Input [] = {1, 2, 3, 4, 5, 6, 7};
+static int FirstTest_Output [] = {1, 2, 3, 4, 5, 6, 7};
 
 #define SECOND_TEST_SIZE 7
-int SecondTest_Input [] = {7, 6, 5, 4, 3, 2, 1};
-int SecondTest_Output [] = {1, 2, 3, 4, 5, 6, 7};
+static int SecondTest_Input [] = {7, 6, 5, 4, 3, 2, 1};
+static int SecondTest_Output [] = {1, 2, 3, 4, 5, 6, 7};
 
 #define THIRD_TEST_SIZE 8
-int ThirdTest_Input [] = {34, 12, 31, 66, 98, 45, 23, 11};
-int ThirdTest_Output [] = {11, 12, 23, 31, 34, 45, 66, 98};
+static int ThirdTest_Input [] = {34, 12, 31, 66, 98, 45, 23, 11};
+static int ThirdTest_Output [] = {11, 12, 23, 31, 34, 45, 66, 98};
 
 #define FOURTH_TEST_SIZE 10
-int FourthTest_Input [] = {1, 1, 1, 2, 3, 4, 4, 5, 6, 7};
-int FourthTest_Output [] = {1, 1, 1, 2, 3, 4, 4, 5, 6, 7};
+static int FourthTest_Input [] = {1, 1, 1, 2, 3, 4, 4, 5, 6, 7};
+static int FourthTest_Output [] = {1, 1, 1, 2, 3, 4, 4, 5, 6, 7};
 
 #define FIFTH_TEST_SIZE 10
-int FifthTest_Input [] = {7, 7, 7, 6, 5, 5, 4, 3, 2, 1};
-int FifthTest_Output [] = {1, 2, 3, 4, 5, 5, 6, 7, 7, 7};
+static int FifthTest_Input [] = {7, 7, 7, 6, 5, 5, 4, 3, 2, 1};
+static int FifthTest_Output [] = {1, 2, 3, 4, 5, 5, 6, 7, 7, 7};
 
 #define SIXTH_TEST_SIZE 11
-int SixthTest_Input [] = {34, 12, 34, 31, 66, 11, 45, 98, 45, 23, 11};
-int SixthTest_Output [] = {11, 11, 12, 23, 31, 34, 34, 45, 45, 66, 98};
+static int SixthTest_Input [] = {34, 12, 34, 31, 66, 11, 45, 98, 45, 23, 11};
+static int SixthTest_Output [] = {11, 11, 12, 23, 31, 34, 34, 45, 45, 66, 98};
 
 static lint Comparator (const void *first, const void *second)
 {
