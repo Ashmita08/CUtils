@@ -66,6 +66,7 @@ void PArraySortSuite_Helper_CheckVector (void **vector, uint size, const int *ex
         ++expectedOutput;
     }
 }
+
 static void PArraySortSuite_Helper_MergeSortTest (uint size, int *input, const int *expectedOutput)
 {
     void **vector = malloc (sizeof (void *) * size);
@@ -81,6 +82,16 @@ static void PArraySortSuite_Helper_InplaceMergeSortTest (uint size, int *input, 
     void **vector = malloc (sizeof (void *) * size);
     PArraySortSuite_Helper_FillVector (vector, size, input);
     PArrayInplaceMergeSort (vector, vector + size, Comparator);
+
+    PArraySortSuite_Helper_CheckVector (vector, size, expectedOutput);
+    free (vector);
+}
+
+static void PArraySortSuite_Helper_HeapSortTest (uint size, int *input, const int *expectedOutput)
+{
+    void **vector = malloc (sizeof (void *) * size);
+    PArraySortSuite_Helper_FillVector (vector, size, input);
+    PArrayHeapSort (vector, vector + size, Comparator);
 
     PArraySortSuite_Helper_CheckVector (vector, size, expectedOutput);
     free (vector);
@@ -156,6 +167,36 @@ static void PArraySortSuite_InplaceMergeSixth ()
     PArraySortSuite_Helper_InplaceMergeSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
 }
 
+static void PArraySortSuite_HeapFirst ()
+{
+    PArraySortSuite_Helper_HeapSortTest (FIRST_TEST_SIZE, FirstTest_Input, FirstTest_Output);
+}
+
+static void PArraySortSuite_HeapSecond ()
+{
+    PArraySortSuite_Helper_HeapSortTest (SECOND_TEST_SIZE, SecondTest_Input, SecondTest_Output);
+}
+
+static void PArraySortSuite_HeapThird ()
+{
+    PArraySortSuite_Helper_HeapSortTest (THIRD_TEST_SIZE, ThirdTest_Input, ThirdTest_Output);
+}
+
+static void PArraySortSuite_HeapFourth ()
+{
+    PArraySortSuite_Helper_HeapSortTest (FOURTH_TEST_SIZE, FourthTest_Input, FourthTest_Output);
+}
+
+static void PArraySortSuite_HeapFifth ()
+{
+    PArraySortSuite_Helper_HeapSortTest (FIFTH_TEST_SIZE, FifthTest_Input, FifthTest_Output);
+}
+
+static void PArraySortSuite_HeapSixth ()
+{
+    PArraySortSuite_Helper_HeapSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
+}
+
 void RegisterPArraySortSuite ()
 {
     CU_CI_DEFINE_SUITE ("Sort", NULL, NULL, PArraySortSuite_Setup, PArraySortSuite_Teardown);
@@ -172,4 +213,11 @@ void RegisterPArraySortSuite ()
     CUNIT_CI_TEST (PArraySortSuite_InplaceMergeFourth);
     CUNIT_CI_TEST (PArraySortSuite_InplaceMergeFifth);
     CUNIT_CI_TEST (PArraySortSuite_InplaceMergeSixth);
+
+    CUNIT_CI_TEST (PArraySortSuite_HeapFirst);
+    CUNIT_CI_TEST (PArraySortSuite_HeapSecond);
+    CUNIT_CI_TEST (PArraySortSuite_HeapThird);
+    CUNIT_CI_TEST (PArraySortSuite_HeapFourth);
+    CUNIT_CI_TEST (PArraySortSuite_HeapFifth);
+    CUNIT_CI_TEST (PArraySortSuite_HeapSixth);
 }

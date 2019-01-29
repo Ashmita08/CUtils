@@ -1,6 +1,94 @@
 #include "PArraySort.h"
 #include <stdlib.h>
 
+static void PArrayHeapSort_SiftDown (void **begin, void **end, ulint elementIndex,
+        lint (*Comparator) (const void *first, const void *second))
+{
+    ulint size = end - begin;
+    if (elementIndex >= size)
+    {
+        return;
+    }
+
+    char mustSift = 1;
+    void *valueToSift = begin [elementIndex];
+
+    while (mustSift)
+    {
+        mustSift = 0;
+        ulint leftChild = elementIndex * 2 + 1;
+        ulint rightChild = elementIndex * 2 + 2;
+
+        void **current = begin + elementIndex;
+        void **left = begin + (elementIndex * 2 + 1);
+        void **right = begin + (elementIndex * 2 + 2);
+
+        if (right > end)
+        {
+            *current = valueToSift;
+            return;
+        }
+
+        if (right == end)
+        {
+            if (Comparator (*left, valueToSift) < 0)
+            {
+                *current = *left;
+                *left = valueToSift;
+            }
+            else
+            {
+                *current = valueToSift;
+            }
+        }
+        else
+        {
+            void **better = NULL;
+            ulint betterIndex;
+
+            if (Comparator (*right, *left) < 0)
+            {
+                better = right;
+                betterIndex = rightChild;
+            }
+            else
+            {
+                better = left;
+                betterIndex = leftChild;
+            }
+
+            if (Comparator (*better, valueToSift) < 0)
+            {
+                *current = *better;
+                elementIndex = betterIndex;
+                mustSift = 1;
+            }
+            else
+            {
+                *current = valueToSift;
+            }
+        }
+    }
+}
+
+void PArrayHeapSort (void **begin, void **end, lint (*Comparator) (const void *first, const void *second))
+{
+    ulint size = end - begin;
+    for (ulint index = size / 2; index < size; --index)
+    {
+        PArrayHeapSort_SiftDown (begin, end, index, Comparator);
+    }
+
+    while (size > 0)
+    {
+        void *temp = *begin;
+        *begin = begin [size - 1];
+        begin [size - 1] = temp;
+        --size;
+        PArrayHeapSort_SiftDown (begin, begin + size, 0, Comparator);
+    }
+}
+
 void PArrayMergeSortedParts (void **begin, void **middle, void **end,
         lint (*Comparator) (const void *first, const void *second))
 {

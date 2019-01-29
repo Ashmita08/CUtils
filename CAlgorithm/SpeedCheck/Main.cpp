@@ -3,6 +3,6 @@
 
 int main ()
 {
-    Sort_vs_stdsort ();
+    //Sort_vs_stdsort ();
     PArraySort_vs_stdsort ();
 }

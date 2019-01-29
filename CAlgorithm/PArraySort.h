@@ -3,6 +3,7 @@
 
 #include <CContainers/Interfaces.h>
 
+void PArrayHeapSort (void **begin, void **end, lint (*Comparator) (const void *first, const void *second));
 void PArrayMergeSortedParts (void **begin, void **middle, void **end,
         lint (*Comparator) (const void *first, const void *second));
 
