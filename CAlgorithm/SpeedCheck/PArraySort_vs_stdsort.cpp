@@ -73,6 +73,16 @@ static clock_t Check_QuickSort ()
     return clock () - begin;
 }
 
+static clock_t Check_IntroSort ()
+{
+    void **vector = CreateVector ();
+    clock_t begin = clock ();
+    PArrayIntroSort (vector, vector + TEST_AMOUNT, Comparator);
+
+    free (vector);
+    return clock () - begin;
+}
+
 static std::vector <lint> *CreateStdVector ()
 {
     auto *vector = new std::vector <lint> ();
@@ -125,6 +135,7 @@ void PArraySort_vs_stdsort ()
     printf ("PArrayInplaceMergeSort: %dms.\n", (int) (Check_InplaceMergeSort () * 1000 / CLOCKS_PER_SEC));
     printf ("PArrayHeapSort: %dms.\n", (int) (Check_HeapSort () * 1000 / CLOCKS_PER_SEC));
     printf ("PArrayQuickSort: %dms.\n", (int) (Check_QuickSort () * 1000 / CLOCKS_PER_SEC));
+    printf ("PArrayIntroSort: %dms.\n", (int) (Check_IntroSort () * 1000 / CLOCKS_PER_SEC));
 
     printf ("std::sort: %dms.\n", (int) (Check_stdsort () * 1000 / CLOCKS_PER_SEC));
     printf ("std::sort_heap: %dms.\n", (int) (Check_stdsortheap () * 1000 / CLOCKS_PER_SEC));

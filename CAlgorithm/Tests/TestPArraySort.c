@@ -107,6 +107,16 @@ static void PArraySortSuite_Helper_QuickSortTest (uint size, int *input, const i
     free (vector);
 }
 
+static void PArraySortSuite_Helper_IntroSortTest (uint size, int *input, const int *expectedOutput)
+{
+    void **vector = malloc (sizeof (void *) * size);
+    PArraySortSuite_Helper_FillVector (vector, size, input);
+    PArrayIntroSort (vector, vector + size, Comparator);
+
+    PArraySortSuite_Helper_CheckVector (vector, size, expectedOutput);
+    free (vector);
+}
+
 static void PArraySortSuite_Setup ()
 {
 
@@ -237,6 +247,36 @@ static void PArraySortSuite_QuickSixth ()
     PArraySortSuite_Helper_QuickSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
 }
 
+static void PArraySortSuite_IntroFirst ()
+{
+    PArraySortSuite_Helper_IntroSortTest (FIRST_TEST_SIZE, FirstTest_Input, FirstTest_Output);
+}
+
+static void PArraySortSuite_IntroSecond ()
+{
+    PArraySortSuite_Helper_IntroSortTest (SECOND_TEST_SIZE, SecondTest_Input, SecondTest_Output);
+}
+
+static void PArraySortSuite_IntroThird ()
+{
+    PArraySortSuite_Helper_IntroSortTest (THIRD_TEST_SIZE, ThirdTest_Input, ThirdTest_Output);
+}
+
+static void PArraySortSuite_IntroFourth ()
+{
+    PArraySortSuite_Helper_IntroSortTest (FOURTH_TEST_SIZE, FourthTest_Input, FourthTest_Output);
+}
+
+static void PArraySortSuite_IntroFifth ()
+{
+    PArraySortSuite_Helper_IntroSortTest (FIFTH_TEST_SIZE, FifthTest_Input, FifthTest_Output);
+}
+
+static void PArraySortSuite_IntroSixth ()
+{
+    PArraySortSuite_Helper_IntroSortTest (SIXTH_TEST_SIZE, SixthTest_Input, SixthTest_Output);
+}
+
 void RegisterPArraySortSuite ()
 {
     CU_CI_DEFINE_SUITE ("Sort", NULL, NULL, PArraySortSuite_Setup, PArraySortSuite_Teardown);
@@ -267,4 +307,11 @@ void RegisterPArraySortSuite ()
     CUNIT_CI_TEST (PArraySortSuite_QuickFourth);
     CUNIT_CI_TEST (PArraySortSuite_QuickFifth);
     CUNIT_CI_TEST (PArraySortSuite_QuickSixth);
+
+    CUNIT_CI_TEST (PArraySortSuite_IntroFirst);
+    CUNIT_CI_TEST (PArraySortSuite_IntroSecond);
+    CUNIT_CI_TEST (PArraySortSuite_IntroThird);
+    CUNIT_CI_TEST (PArraySortSuite_IntroFourth);
+    CUNIT_CI_TEST (PArraySortSuite_IntroFifth);
+    CUNIT_CI_TEST (PArraySortSuite_IntroSixth);
 }

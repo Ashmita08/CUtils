@@ -1,5 +1,6 @@
 #include "PArraySort.h"
 #include <stdlib.h>
+#include <math.h>
 
 static void PArrayHeapSort_SiftDown (void **begin, void **end, ulint elementIndex,
         lint (*Comparator) (const void *first, const void *second))
@@ -339,4 +340,33 @@ void PArrayQuickSort (void **begin, void **end, lint (*Comparator) (const void *
             stack [stackSize++] = end;
         }
     }
+}
+
+void PArrayIntroSortInternal (void **begin, void **end, ulint depthLimit,
+        lint (*Comparator) (const void *first, const void *second))
+{
+    if (depthLimit == 0)
+    {
+        PArrayHeapSort (begin, end, Comparator);
+    }
+    else
+    {
+        void **middle = PArrayQuickSortPartition (begin, end, Comparator);
+        if (begin != middle)
+        {
+            PArrayIntroSortInternal (begin, middle, depthLimit - 1, Comparator);
+        }
+
+        if (middle + 1 != end)
+        {
+            PArrayIntroSortInternal (middle + 1, end, depthLimit - 1, Comparator);
+        }
+    }
+}
+
+void PArrayIntroSort (void **begin, void **end, lint (*Comparator) (const void *first, const void *second))
+{
+    ulint size = end - begin;
+    ulint depthLimit = (ulint) log (size);
+    PArrayIntroSortInternal (begin, end, depthLimit, Comparator);
 }
