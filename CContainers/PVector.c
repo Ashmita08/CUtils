@@ -120,7 +120,7 @@ PVectorIterator PVector_Insert (PVectorHandle handle, PVectorIterator where, voi
     if (vector->size > vector->capacity)
     {
         ulint index = where - PVector_Begin (handle);
-        vector->capacity += (int) (vector->capacity * BUFFER_INCREASE_MODIFIER);
+        vector->capacity += (ulint) (vector->capacity * BUFFER_INCREASE_MODIFIER);
         vector->buffer = realloc (vector->buffer, sizeof (void **) * vector->capacity);
         where = PVector_Begin (handle) + index;
     }
