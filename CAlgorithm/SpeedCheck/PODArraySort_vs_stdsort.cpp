@@ -1,4 +1,4 @@
-#include "PArraySort_vs_stdsort.hpp"
+#include "PODArraySort_vs_stdsort.hpp"
 #include <algorithm>
 #include <ctime>
 #include <vector>
@@ -6,28 +6,28 @@
 
 extern "C"
 {
-#include <CAlgorithm/PArraySort.h>
+#include <CAlgorithm/PODArraySort.h>
 #include <CContainers/PVector.h>
 #include <CContainers/Utils.h>
 }
 
-#define RAND_SEED 23432
-#define TEST_AMOUNT 5000000
+#define RAND_SEED 24315
+#define TEST_AMOUNT 2000000
 
-static lint Comparator (const void *first, const void *second)
+static lint Comparator (const char*first, const char *second)
 {
-    return (const lint) second - (const lint) first;
+    return *(const lint *) second - *(const lint *) first;
 }
 
-static void **CreateVector ()
+static lint *CreateVector ()
 {
-    void **vector = (void **) malloc (sizeof (lint) * TEST_AMOUNT);
+    lint *vector = (lint *) malloc (sizeof (lint) * TEST_AMOUNT);
     srand (RAND_SEED);
 
     for (int index = 0; index < TEST_AMOUNT; ++index)
     {
         lint number = rand ();
-        vector [index] = (void *) number;
+        vector [index] = number;
     }
 
     return vector;
@@ -35,9 +35,9 @@ static void **CreateVector ()
 
 static clock_t Check_MergeSort ()
 {
-    void **vector = CreateVector ();
+    lint *vector = CreateVector ();
     clock_t begin = clock ();
-    PArrayMergeSort (vector, vector + TEST_AMOUNT, Comparator);
+    PODArrayMergeSort ((char *) vector, (char *) (vector + TEST_AMOUNT), sizeof (lint), Comparator);
 
     free (vector);
     return clock () - begin;
@@ -45,9 +45,9 @@ static clock_t Check_MergeSort ()
 
 static clock_t Check_InplaceMergeSort ()
 {
-    void **vector = CreateVector ();
+    lint *vector = CreateVector ();
     clock_t begin = clock ();
-    PArrayInplaceMergeSort (vector, vector + TEST_AMOUNT, Comparator);
+    PODArrayInplaceMergeSort ((char *) vector, (char *) (vector + TEST_AMOUNT), sizeof (lint), Comparator);
 
     free (vector);
     return clock () - begin;
@@ -55,9 +55,9 @@ static clock_t Check_InplaceMergeSort ()
 
 static clock_t Check_HeapSort ()
 {
-    void **vector = CreateVector ();
+    lint *vector = CreateVector ();
     clock_t begin = clock ();
-    PArrayHeapSort (vector, vector + TEST_AMOUNT, Comparator);
+    PODArrayHeapSort ((char *) vector, (char *) (vector + TEST_AMOUNT), sizeof (lint), Comparator);
 
     free (vector);
     return clock () - begin;
@@ -65,9 +65,9 @@ static clock_t Check_HeapSort ()
 
 static clock_t Check_QuickSort ()
 {
-    void **vector = CreateVector ();
+    lint *vector = CreateVector ();
     clock_t begin = clock ();
-    PArrayQuickSort (vector, vector + TEST_AMOUNT, Comparator);
+    PODArrayQuickSort ((char *) vector, (char *) (vector + TEST_AMOUNT), sizeof (lint), Comparator);
 
     free (vector);
     return clock () - begin;
@@ -75,9 +75,9 @@ static clock_t Check_QuickSort ()
 
 static clock_t Check_IntroSort ()
 {
-    void **vector = CreateVector ();
+    lint *vector = CreateVector ();
     clock_t begin = clock ();
-    PArrayIntroSort (vector, vector + TEST_AMOUNT, Comparator);
+    PODArrayIntroSort ((char *) vector, (char *) (vector + TEST_AMOUNT), sizeof (lint), Comparator);
 
     free (vector);
     return clock () - begin;
@@ -128,14 +128,14 @@ static clock_t Check_stdstablesort ()
     return clock () - begin;
 }
 
-void PArraySort_vs_stdsort ()
+void PODArraySort_vs_stdsort ()
 {
-    printf ("PArraySort: amount of items -- %d.\n", TEST_AMOUNT);
-    printf ("PArrayMergeSort: %dms.\n", (int) (Check_MergeSort () * 1000 / CLOCKS_PER_SEC));
-    printf ("PArrayInplaceMergeSort: %dms.\n", (int) (Check_InplaceMergeSort () * 1000 / CLOCKS_PER_SEC));
-    printf ("PArrayHeapSort: %dms.\n", (int) (Check_HeapSort () * 1000 / CLOCKS_PER_SEC));
-    printf ("PArrayQuickSort: %dms.\n", (int) (Check_QuickSort () * 1000 / CLOCKS_PER_SEC));
-    printf ("PArrayIntroSort: %dms.\n", (int) (Check_IntroSort () * 1000 / CLOCKS_PER_SEC));
+    printf ("PODArraySort: amount of items -- %d.\n", TEST_AMOUNT);
+    printf ("PODArrayMergeSort: %dms.\n", (int) (Check_MergeSort () * 1000 / CLOCKS_PER_SEC));
+    printf ("PODArrayInplaceMergeSort: %dms.\n", (int) (Check_InplaceMergeSort () * 1000 / CLOCKS_PER_SEC));
+    printf ("PODArrayHeapSort: %dms.\n", (int) (Check_HeapSort () * 1000 / CLOCKS_PER_SEC));
+    printf ("PODArrayQuickSort: %dms.\n", (int) (Check_QuickSort () * 1000 / CLOCKS_PER_SEC));
+    printf ("PODArrayIntroSort: %dms.\n", (int) (Check_IntroSort () * 1000 / CLOCKS_PER_SEC));
 
     printf ("std::sort: %dms.\n", (int) (Check_stdsort () * 1000 / CLOCKS_PER_SEC));
     printf ("std::sort_heap: %dms.\n", (int) (Check_stdsortheap () * 1000 / CLOCKS_PER_SEC));

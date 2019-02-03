@@ -1,2 +1,2 @@
-add_executable (CAlgorithmSpeedCheck Main.cpp Sort_vs_stdsort.cpp Sort_vs_stdsort.hpp PArraySort_vs_stdsort.cpp PArraySort_vs_stdsort.hpp)
+add_executable (CAlgorithmSpeedCheck Main.cpp Sort_vs_stdsort.cpp Sort_vs_stdsort.hpp PODArraySort_vs_stdsort.cpp PODArraySort_vs_stdsort.hpp)
 target_link_libraries (CAlgorithmSpeedCheck CAlgorithm)
