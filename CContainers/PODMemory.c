@@ -26,16 +26,21 @@ void PODMemory_Swap (char *firstElement, char *secondElement, ulint elementSize)
 
 void PODMemory_Copy (char *destination, const char *source, ulint elementSize)
 {
+    char *destinationEnd = destination + elementSize;
 #define CopyCore(baseType) \
-    while (elementSize >= sizeof (baseType)) \
+    if (destinationEnd - destination >= sizeof (baseType)) \
     { \
-        *(baseType *) destination = *(baseType *) source; \
-        destination += sizeof (baseType); \
-        source += sizeof (baseType); \
-        elementSize -= sizeof (baseType); \
-    } \
-    \
-    if (!elementSize) return;
+        while (destination < destinationEnd) \
+        { \
+            *(baseType *) destination = *(baseType *) source; \
+            destination += sizeof (baseType); \
+            source += sizeof (baseType); \
+        } \
+        \
+        if (destination == destinationEnd) return; \
+        destination -= sizeof (baseType); \
+        source -= sizeof (baseType); \
+    }
 
     CopyCore (llint);
     CopyCore (lint);
@@ -67,14 +72,17 @@ void PODMemory_MoveLeft (char *memory, ulint elementSize, ulint offset)
 {
     char *memoryEnd = memory + elementSize;
 #define MoveLeftCore(baseType) \
-    while (memory < memoryEnd) \
+    if (memoryEnd - memory >= sizeof (baseType)) \
     { \
-        *(baseType *) (memory - offset) = *(baseType *) memory; \
-        memory += sizeof (baseType); \
-    } \
-    \
-    if (memory == memoryEnd) return; \
-    memory -= sizeof (baseType);
+        while (memory < memoryEnd) \
+        { \
+            *(baseType *) (memory - offset) = *(baseType *) memory; \
+            memory += sizeof (baseType); \
+        } \
+        \
+        if (memory == memoryEnd) return; \
+        memory -= sizeof (baseType); \
+    }
 
     MoveLeftCore (llint);
     MoveLeftCore (lint);
