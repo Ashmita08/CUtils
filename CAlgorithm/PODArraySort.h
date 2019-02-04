@@ -3,7 +3,6 @@
 
 #include <CContainers/Interfaces.h>
 
-void PODElementSwap (char *firstElement, char *secondElement, ulint elementSize);
 void PODArrayHeapSort (char *begin, const char *end, ulint elementSize,
         lint (*Comparator) (const char *first, const char *second));
 

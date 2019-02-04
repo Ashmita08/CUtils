@@ -1,21 +1,8 @@
 #include "PODArraySort.h"
+#include <CContainers/PODMemory.h>
 #include <stdlib.h>
 #include <math.h>
 #include <memory.h>
-
-void PODElementSwap (char *firstElement, char *secondElement, ulint elementSize)
-{
-    while (elementSize > 0)
-    {
-        char temp = *firstElement;
-        *firstElement = *secondElement;
-        *secondElement = temp;
-
-        ++firstElement;
-        ++secondElement;
-        --elementSize;
-    }
-}
 
 static void PODArrayHeapSort_SiftDown (char *begin, const char *end, ulint elementIndex, ulint elementSize,
         lint (*Comparator) (const char *first, const char *second))
@@ -101,7 +88,7 @@ void PODArrayHeapSort (char *begin, const char *end, ulint elementSize,
 
     while (size > 0)
     {
-        PODElementSwap (begin, begin + (size - 1) * elementSize, elementSize);
+        PODMemory_Swap (begin, begin + (size - 1) * elementSize, elementSize);
         --size;
         PODArrayHeapSort_SiftDown (begin, begin + size * elementSize, 0, elementSize, Comparator);
     }
@@ -224,7 +211,7 @@ void PODArrayInplaceMergeSortedParts (char *begin, char *middle, char *end, ulin
     char *leftBegin = begin + (leftPartSize - mid) * elementSize;
     char *rightEnd = middle + mid * elementSize;
 
-    PODElementSwap (leftBegin, middle, mid * elementSize);
+    PODMemory_Swap (leftBegin, middle, mid * elementSize);
     if (mid != leftPartSize)
     {
         PODArrayInplaceMergeSortedParts (begin, leftBegin, middle, elementSize, Comparator);
@@ -294,20 +281,21 @@ char *PODArrayQuickSortPartition (char *begin, char *end, ulint elementSize,
     {
         if (Comparator (iterator, pivotIterator) >= 0)
         {
-            PODElementSwap (iterator, nextSmallerIterator, elementSize);
+            PODMemory_Swap (iterator, nextSmallerIterator, elementSize);
             nextSmallerIterator += elementSize;
         }
 
         iterator += elementSize;
     }
 
-    PODElementSwap (pivotIterator, nextSmallerIterator, elementSize);
+    PODMemory_Swap (pivotIterator, nextSmallerIterator, elementSize);
     return nextSmallerIterator;
 }
 
 void PODArrayQuickSort (char *begin, char *end, ulint elementSize,
         lint (*Comparator) (const char *first, const char *second))
 {
+    // TODO: Maybe switch back to recursive implementation to save memory?
     ulint size = (end - begin) / elementSize;
     char **stack = malloc (sizeof (ulint) * size * 2);
 
