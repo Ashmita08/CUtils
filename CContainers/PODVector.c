@@ -1,6 +1,7 @@
 #include "PODVector.h"
 #include "Utils.h"
 #include "Errors.h"
+#include "PODMemory.h"
 #include <stdlib.h>
 #include <memory.h>
 
@@ -100,17 +101,10 @@ char PODVector_Insert (PODVectorHandle handle, ulint where, char *value)
 
     if (where < size - 1)
     {
-        char *position = vector->buffer + size * elementSize - 1;
-        char *insertionPoint = vector->buffer + where * elementSize;
-
-        while (position >= insertionPoint)
-        {
-            *position = *(position - elementSize);
-            --position;
-        }
+        PODMemory_MoveRight (vector->buffer + where * elementSize, (size - where - 1) * elementSize, elementSize);
     }
 
-    memcpy (vector->buffer + where * vector->elementSize, value, vector->elementSize);
+    PODMemory_Copy (vector->buffer + where * vector->elementSize, value, vector->elementSize);
     return 1;
 }
 
@@ -128,14 +122,8 @@ char PODVector_Erase (PODVectorHandle handle, ulint position)
 
     if (position != vector->size)
     {
-        char *current = vector->buffer + position * elementSize;
-        char *end = vector->buffer + vector->size * elementSize;
-
-        while (current != end)
-        {
-            *current = *(current + elementSize);
-            ++current;
-        }
+        PODMemory_MoveLeft (vector->buffer + (position + 1) * elementSize,
+                (vector->size - position) * elementSize, elementSize);
     }
 
     return 1;
