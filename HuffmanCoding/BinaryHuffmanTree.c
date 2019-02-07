@@ -9,8 +9,7 @@
 #define INITIAL_TREE_NODES_CAPACITY 257
 typedef struct
 {
-    ushort zeroChild;
-    ushort oneChild;
+    ushort children [2];
     byte leafValue;
 } Node;
 
@@ -29,22 +28,22 @@ typedef struct
 static void SetBitInCode (byte *codeBuffer, ulint bitIndex, byte value)
 {
     codeBuffer += bitIndex >> 3;
-    bitIndex = (byte) (7 - bitIndex & 7);
+    bitIndex = (byte) (7 - (bitIndex & 7));
 
-    if (*codeBuffer & (1 << bitIndex))
+    if (value)
     {
-        *codeBuffer &= value << bitIndex;
+        *codeBuffer |= 1 << bitIndex;
     }
     else
     {
-        *codeBuffer |= value << bitIndex;
+        *codeBuffer &= ~(1 << bitIndex);
     }
 }
 
 static byte GetBitInCode (const byte *codeBuffer, ulint bitIndex)
 {
     codeBuffer += bitIndex >> 3;
-    bitIndex = (byte) (7 - bitIndex & 7);
+    bitIndex = (byte) (7 - (bitIndex & 7));
     return (byte) ((*codeBuffer & (1 << bitIndex)) != 0);
 }
 
@@ -89,10 +88,10 @@ static void InsertLeavesToHuffmanTree (PODVectorHandle treeNodes, byte *input, u
     free (counters);
 }
 
-static void SelectHuffmanTreeCapacity (PODVectorHandle treeNodes)
+static void SelectHuffmanTreeCapacity (PODVectorHandle treeNodes, ulint leavesCount)
 {
     ulint maximumExpectedSize = 0;
-    ulint step = PODVector_Size (treeNodes);
+    ulint step = leavesCount + 1;
 
     do
     {
@@ -105,19 +104,25 @@ static void SelectHuffmanTreeCapacity (PODVectorHandle treeNodes)
     PODVector_Realloc (treeNodes, maximumExpectedSize);
 }
 
+static void SelectHuffmanTreeCapacityAfterLeavesInsertion (PODVectorHandle treeNodes)
+{
+    SelectHuffmanTreeCapacity (treeNodes, PODVector_Size (treeNodes) - 1);
+}
+
 /// Returns PODVector of nodes with priority and index. Last value in PODVector is root, 0 index is fake node.
 static PODVectorHandle BuildHuffmanTreeForInput (byte *input, ulint input_length)
 {
     PODVectorHandle treeNodes = PODVector_Create (INITIAL_TREE_NODES_CAPACITY, sizeof (NodeWithPriorityAndIndex));
     InsertLeavesToHuffmanTree (treeNodes, input, input_length);
-    SelectHuffmanTreeCapacity (treeNodes);
+    SelectHuffmanTreeCapacityAfterLeavesInsertion (treeNodes);
 
     PVectorHandle heapVector = PVector_Create (INITIAL_TREE_NODES_CAPACITY);
-    NodeWithPriority *currentNode = ((NodeWithPriority *) PODVector_Begin (treeNodes)) + 1;
+    NodeWithPriorityAndIndex *currentNode = ((NodeWithPriorityAndIndex *) PODVector_Begin (treeNodes)) + 1;
 
-    while (currentNode != (NodeWithPriority *) PODVector_End (treeNodes))
+    while (currentNode != (NodeWithPriorityAndIndex *) PODVector_End (treeNodes))
     {
         PVector_Insert (heapVector, PVector_End (heapVector), currentNode);
+        ++currentNode;
     }
 
     PVectorHandle heap = PVectorHeap_Heapify (heapVector, NodePriorityComparator);
@@ -152,18 +157,18 @@ static void RecursiveGenerateByteCode (ushort nodeIndex, RecursiveGenerateByteCo
     ++context->currentDepth;
     Node *node = (Node *) PODVector_At (context->treeNodes, (ulint) nodeIndex);
 
-    if (node->zeroChild || node->oneChild)
+    if (node->children [0] || node->children [1])
     {
-        if (node->zeroChild != 0)
+        if (node->children [0] != 0)
         {
             SetBitInCode (context->currentCode, context->currentDepth, 0);
-            RecursiveGenerateByteCode (node->zeroChild, context);
+            RecursiveGenerateByteCode (node->children [0], context);
         }
 
-        if (node->oneChild != 0)
+        if (node->children [1] != 0)
         {
             SetBitInCode (context->currentCode, context->currentDepth, 1);
-            RecursiveGenerateByteCode (node->oneChild, context);
+            RecursiveGenerateByteCode (node->children [1], context);
         }
     }
     else
@@ -179,7 +184,7 @@ static void GenerateByteCode (byte *input, ulint input_length, output ByteCode *
 {
     RecursiveGenerateByteCodeContext context;
     context.treeNodes = BuildHuffmanTreeForInput (input, input_length);
-    context.currentDepth = 0;
+    context.currentDepth = (ushort) -1;
     context.resultCodes = resultCodes;
 
     RecursiveGenerateByteCode ((ushort) (PODVector_Size (context.treeNodes) - 1), &context);
@@ -191,7 +196,8 @@ static void WriteEncodedByte (byte *encoded, ulint *bitIndex, byte toCode, ByteC
     ushort codeBitIndex = 0;
     while (codeBitIndex < codes [toCode].bitLength)
     {
-        SetBitInCode (encoded, *bitIndex, GetBitInCode (codes [toCode].code, codeBitIndex));
+        byte bit = GetBitInCode (codes [toCode].code, codeBitIndex);
+        SetBitInCode (encoded, *bitIndex, bit);
         ++codeBitIndex;
         ++*bitIndex;
     }
@@ -221,33 +227,56 @@ byte *Huffman_Encode (byte *input, ulint input_length, output ulint *codeSize, o
     return encoded;
 }
 
+static ulint CalculateLeavesCount (ByteCode *codes)
+{
+    ushort leafValue = 0;
+    ulint leaves = 0;
+
+    while (leafValue < 256)
+    {
+        if (codes [leafValue].bitLength > 0)
+        {
+            ++leaves;
+        }
+
+        ++leafValue;
+    }
+
+    return leaves;
+}
+
 /// Returns PODVector of nodes. First node ([0]) index is fake node, second ([1]) is root.
 PODVectorHandle ConstructTrie (ByteCode *codes)
 {
     PODVectorHandle trie = PODVector_Create (INITIAL_TREE_NODES_CAPACITY, sizeof (Node));
+    SelectHuffmanTreeCapacity (trie, CalculateLeavesCount (codes));
+
     Node toInsert = {0, 0, 0};
+    // Insert dummy.
+    PODVector_Insert (trie, 0, (char *) &toInsert);
+    // Insert root.
     PODVector_Insert (trie, 0, (char *) &toInsert);
 
     ushort byteValue = 0;
     while (byteValue < 256)
     {
-        if (codes [byteValue].bitLength > 0)
+        if (codes->bitLength > 0)
         {
             Node *currentNode = (Node *) PODVector_At (trie, 1);
             ushort bitIndex = 0;
 
-            while (bitIndex < codes [byteValue].bitLength)
+            while (bitIndex < codes->bitLength)
             {
-                byte bit = GetBitInCode (codes [byteValue].code, bitIndex);
+                byte bit = GetBitInCode (codes->code, bitIndex);
                 ++bitIndex;
 
-                if (*(&(currentNode->zeroChild) + bit) == 0)
+                if (currentNode->children [bit] == 0)
                 {
-                    *(&(currentNode->zeroChild) + bit) = (ushort) PODVector_Size (trie);
+                    currentNode->children [bit] = (ushort) PODVector_Size (trie);
                     PODVector_Insert (trie, PODVector_Size (trie), (char *) &toInsert);
                 }
 
-                currentNode = (Node *) PODVector_At (trie, *(&(currentNode->zeroChild) + bit));
+                currentNode = (Node *) PODVector_At (trie, currentNode->children [bit]);
             }
 
             currentNode->leafValue = (byte) byteValue;
@@ -270,7 +299,7 @@ byte *Huffman_Decode (byte *input, ulint input_length, ulint *maxDecodedSize, By
     while (decodedSize < *maxDecodedSize)
     {
         Node *currentNode = (Node *) PODVector_At (trie, 1);
-        while (currentNode->zeroChild != 0 || currentNode->oneChild != 0)
+        while (currentNode->children [0] != 0 || currentNode->children [1] != 0)
         {
             if ((bitIndex >> 3) >= input_length)
             {
@@ -281,10 +310,10 @@ byte *Huffman_Decode (byte *input, ulint input_length, ulint *maxDecodedSize, By
             ++bitIndex;
 
             // TODO: Error handling?
-            currentNode = (Node *) PODVector_At (trie, *(&(currentNode->zeroChild) + bit));
+            currentNode = (Node *) PODVector_At (trie, currentNode->children [bit]);
         }
 
-        if (currentNode->zeroChild == 0 && currentNode->oneChild == 0)
+        if (currentNode->children [0] == 0 && currentNode->children [1] == 0)
         {
             decoded [decodedSize] = currentNode->leafValue;
             ++decodedSize;
