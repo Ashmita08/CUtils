@@ -33,6 +33,7 @@ int ShowHelp ()
 
 int EncodeMode (ulint parallelPartitionsCount, char *inputPath, char *outputPath)
 {
+    int returnCode = 0;
     ullint totalBytesRead = 0;
     byte **partitions;
     ulint *partitionsSizes;
@@ -105,31 +106,48 @@ int EncodeMode (ulint parallelPartitionsCount, char *inputPath, char *outputPath
                 if (fwrite (encodedSizes + partitionIndex, sizeof (ulint), 1, outputFile) != 1)
                 {
                     printf ("Unable to write encoded partition size!\n");
-                    return ERROR_UNABLE_TO_WRITE_DATA;
+                    returnCode = ERROR_UNABLE_TO_WRITE_DATA;
+
+                    free (encodedPartitions [partitionIndex]);
+                    break;
                 }
 
                 if (fwrite (partitionsSizes + partitionIndex, sizeof (ulint), 1, outputFile) != 1)
                 {
                     printf ("Unable to write partition size!\n");
-                    return ERROR_UNABLE_TO_WRITE_DATA;
+                    returnCode = ERROR_UNABLE_TO_WRITE_DATA;
+
+                    free (encodedPartitions [partitionIndex]);
+                    break;
                 }
 
                 if (fwrite (codes [partitionIndex], sizeof (ByteCode), 256, outputFile) != 256)
                 {
                     printf ("Unable to write Huffman tree header!\n");
-                    return ERROR_UNABLE_TO_WRITE_DATA;
+                    returnCode = ERROR_UNABLE_TO_WRITE_DATA;
+
+                    free (encodedPartitions [partitionIndex]);
+                    break;
                 }
 
                 if (fwrite (encodedPartitions [partitionIndex], sizeof (byte),
                     encodedSizes [partitionIndex], outputFile) != encodedSizes [partitionIndex])
                 {
                     printf ("Unable to write encoded partition!\n");
-                    return ERROR_UNABLE_TO_WRITE_DATA;
+                    returnCode = ERROR_UNABLE_TO_WRITE_DATA;
+
+                    free (encodedPartitions [partitionIndex]);
+                    break;
                 }
 
                 free (encodedPartitions [partitionIndex]);
                 totalBytesRead += partitionsSizes [partitionIndex];
             }
+        }
+
+        if (returnCode)
+        {
+            break;
         }
 
         printf ("Parallel partitions encoded! Total encoded: %dMB.\n", (int) (totalBytesRead / (1024 * 1024)));
@@ -155,11 +173,12 @@ int EncodeMode (ulint parallelPartitionsCount, char *inputPath, char *outputPath
 
     free (codes);
     free (encodedSizes);
-    return 0;
+    return returnCode;
 }
 
 int DecodeMode (ulint parallelPartitionsCount, char *inputPath, char *outputPath)
 {
+    int returnCode = 0;
     ullint totalBytesRead = 0;
     FILE *inputFile = fopen (inputPath, "rb");
     FILE *outputFile = fopen (outputPath, "wb");
@@ -212,14 +231,15 @@ int DecodeMode (ulint parallelPartitionsCount, char *inputPath, char *outputPath
                 if (fread (partitionSizes + partitionIndex, sizeof (ulint), 1, inputFile) != 1)
                 {
                     printf ("Unable to read partition size!\n");
-                    // FIXME: Rework error returns both there and non-parallel version! Memory leaks!
-                    return ERROR_ENCODED_FILE_BROKEN;
+                    returnCode = ERROR_ENCODED_FILE_BROKEN;
+                    break;
                 }
 
                 if (fread (codes [partitionIndex], sizeof (ByteCode), 256, inputFile) != 256)
                 {
                     printf ("Unable to read Huffman tree header!\n");
-                    return ERROR_ENCODED_FILE_BROKEN;
+                    returnCode = ERROR_ENCODED_FILE_BROKEN;
+                    break;
                 }
 
                 encodedPartitions [partitionIndex] = malloc (encodedSizes [partitionIndex]);
@@ -227,7 +247,8 @@ int DecodeMode (ulint parallelPartitionsCount, char *inputPath, char *outputPath
                     encodedSizes [partitionIndex], inputFile) != encodedSizes [partitionIndex])
                 {
                     printf ("Unable to read encoded partition!\n");
-                    return ERROR_ENCODED_FILE_BROKEN;
+                    returnCode = ERROR_ENCODED_FILE_BROKEN;
+                    break;
                 }
             }
             else
@@ -236,6 +257,16 @@ int DecodeMode (ulint parallelPartitionsCount, char *inputPath, char *outputPath
                 partitionSizes [partitionIndex] = 0;
                 encodedPartitions [partitionIndex] = NULL;
             }
+        }
+
+        if (returnCode)
+        {
+            for (ulint partitionIndex = 0; partitionIndex < parallelPartitionsCount; ++partitionIndex)
+            {
+                free (encodedPartitions [partitionIndex]);
+            }
+
+            break;
         }
 
 #pragma omp parallel for firstprivate (encodedPartitions) firstprivate (partitionSizes) \
@@ -253,7 +284,7 @@ int DecodeMode (ulint parallelPartitionsCount, char *inputPath, char *outputPath
                 if (maxDecodedSize != partitionSizes [partitionIndex])
                 {
                     printf ("Decoded size is lesser than expected!\n");
-                    //return ERROR_ENCODED_FILE_BROKEN;
+                    returnCode = ERROR_ENCODED_FILE_BROKEN;
                 }
             }
         }
@@ -262,16 +293,30 @@ int DecodeMode (ulint parallelPartitionsCount, char *inputPath, char *outputPath
         {
             if (encodedSizes [partitionIndex] > 0)
             {
+                if (returnCode)
+                {
+                    free (decodedPartitions [partitionIndex]);
+                    break;
+                }
+
                 if (fwrite (decodedPartitions [partitionIndex], sizeof (byte),
                     partitionSizes [partitionIndex], outputFile) != partitionSizes [partitionIndex])
                 {
                     printf ("Unable to write decoded partition!\n");
-                    //return ERROR_UNABLE_TO_WRITE_DATA;
+                    returnCode = ERROR_UNABLE_TO_WRITE_DATA;
+
+                    free (decodedPartitions [partitionIndex]);
+                    break;
                 }
 
                 free (decodedPartitions [partitionIndex]);
                 totalBytesRead += encodedSizes [partitionIndex] + 256 * sizeof (ByteCode) + 2 * sizeof (ulint);
             }
+        }
+
+        if (returnCode)
+        {
+            break;
         }
 
         printf ("Parallel partitions decoded! Total decoded: %dMB.\n", (int) (totalBytesRead / (1024 * 1024)));
@@ -291,7 +336,7 @@ int DecodeMode (ulint parallelPartitionsCount, char *inputPath, char *outputPath
     free (partitionSizes);
     free (encodedPartitions);
     free (decodedPartitions);
-    return 0;
+    return returnCode;
 }
 
 int main (int args_count, char **args)
