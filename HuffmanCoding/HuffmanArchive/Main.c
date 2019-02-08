@@ -32,6 +32,7 @@ int ShowHelp ()
 
 int EncodeMode (char *inputPath, char *outputPath)
 {
+    int returnCode = 0;
     ullint totalBytesRead = 0;
     byte *partition;
     FILE *inputFile = fopen (inputPath, "rb");
@@ -69,25 +70,41 @@ int EncodeMode (char *inputPath, char *outputPath)
         if (fwrite (&encodedSize, sizeof (ulint), 1, outputFile) != 1)
         {
             printf ("Unable to write encoded partition size!\n");
-            return ERROR_UNABLE_TO_WRITE_DATA;
+            returnCode = ERROR_UNABLE_TO_WRITE_DATA;
+
+            free (encoded);
+            free (codes);
+            break;
         }
 
         if (fwrite (&partitionSize, sizeof (ulint), 1, outputFile) != 1)
         {
             printf ("Unable to write partition size!\n");
-            return ERROR_UNABLE_TO_WRITE_DATA;
+            returnCode = ERROR_UNABLE_TO_WRITE_DATA;
+
+            free (encoded);
+            free (codes);
+            break;
         }
 
         if (fwrite (codes, sizeof (ByteCode), 256, outputFile) != 256)
         {
             printf ("Unable to write Huffman tree header!\n");
-            return ERROR_UNABLE_TO_WRITE_DATA;
+            returnCode = ERROR_UNABLE_TO_WRITE_DATA;
+
+            free (encoded);
+            free (codes);
+            break;
         }
 
         if (fwrite (encoded, sizeof (byte), encodedSize, outputFile) != encodedSize)
         {
             printf ("Unable to write encoded partition!\n");
-            return ERROR_UNABLE_TO_WRITE_DATA;
+            returnCode = ERROR_UNABLE_TO_WRITE_DATA;
+
+            free (encoded);
+            free (codes);
+            break;
         }
 
         free (encoded);
@@ -101,11 +118,12 @@ int EncodeMode (char *inputPath, char *outputPath)
     fclose (inputFile);
     fclose (outputFile);
     free (partition);
-    return 0;
+    return returnCode;
 }
 
 int DecodeMode (char *inputPath, char *outputPath)
 {
+    int returnCode = 0;
     ullint totalBytesRead = 0;
     FILE *inputFile = fopen (inputPath, "rb");
     FILE *outputFile = fopen (outputPath, "wb");
@@ -145,26 +163,31 @@ int DecodeMode (char *inputPath, char *outputPath)
         if (fread (&encodedSize, sizeof (ulint), 1, inputFile) != 1)
         {
             printf ("Unable to read encoded partition size!\n");
-            return ERROR_ENCODED_FILE_BROKEN;
+            returnCode = ERROR_ENCODED_FILE_BROKEN;
+            break;
         }
 
         if (fread (&partitionSize, sizeof (ulint), 1, inputFile) != 1)
         {
             printf ("Unable to read partition size!\n");
-            return ERROR_ENCODED_FILE_BROKEN;
+            returnCode = ERROR_ENCODED_FILE_BROKEN;
+            break;
         }
 
         if (fread (codes, sizeof (ByteCode), 256, inputFile) != 256)
         {
             printf ("Unable to read Huffman tree header!\n");
-            return ERROR_ENCODED_FILE_BROKEN;
+            returnCode = ERROR_ENCODED_FILE_BROKEN;
+            break;
         }
 
         encoded = malloc (encodedSize);
         if (fread (encoded, sizeof (byte), encodedSize, inputFile) != encodedSize)
         {
             printf ("Unable to read encoded partition!\n");
-            return ERROR_ENCODED_FILE_BROKEN;
+            returnCode = ERROR_ENCODED_FILE_BROKEN;
+            free (encoded);
+            break;
         }
 
         maxDecodedSize = partitionSize;
@@ -173,13 +196,21 @@ int DecodeMode (char *inputPath, char *outputPath)
         if (maxDecodedSize != partitionSize)
         {
             printf ("Decoded size is lesser than expected!\n");
-            return ERROR_ENCODED_FILE_BROKEN;
+            returnCode = ERROR_ENCODED_FILE_BROKEN;
+
+            free (encoded);
+            free (decoded);
+            break;
         }
 
         if (fwrite (decoded, sizeof (byte), partitionSize, outputFile) != partitionSize)
         {
             printf ("Unable to write decoded partition!\n");
-            return ERROR_UNABLE_TO_WRITE_DATA;
+            returnCode = ERROR_UNABLE_TO_WRITE_DATA;
+
+            free (encoded);
+            free (decoded);
+            break;
         }
 
         free (encoded);
@@ -193,7 +224,7 @@ int DecodeMode (char *inputPath, char *outputPath)
     fclose (inputFile);
     fclose (outputFile);
     free (codes);
-    return 0;
+    return returnCode;
 }
 
 int main (int args_count, char **args)
