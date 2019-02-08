@@ -32,6 +32,7 @@ int ShowHelp ()
 
 int EncodeMode (char *inputPath, char *outputPath)
 {
+    ullint totalBytesRead = 0;
     byte *partition;
     FILE *inputFile = fopen (inputPath, "rb");
     FILE *outputFile = fopen (outputPath, "wb");
@@ -89,9 +90,12 @@ int EncodeMode (char *inputPath, char *outputPath)
             return ERROR_UNABLE_TO_WRITE_DATA;
         }
 
-        fflush (outputFile);
         free (encoded);
         free (codes);
+
+        totalBytesRead += partitionSize;
+        printf ("Partition encoded! Total encoded: %dMB.\n", (int) (totalBytesRead / (1024 * 1024)));
+        fflush (stdout);
     }
 
     fclose (inputFile);
@@ -102,6 +106,7 @@ int EncodeMode (char *inputPath, char *outputPath)
 
 int DecodeMode (char *inputPath, char *outputPath)
 {
+    ullint totalBytesRead = 0;
     FILE *inputFile = fopen (inputPath, "rb");
     FILE *outputFile = fopen (outputPath, "wb");
 
@@ -156,8 +161,7 @@ int DecodeMode (char *inputPath, char *outputPath)
         }
 
         encoded = malloc (encodedSize);
-        ulint tmp;
-        if ((tmp = fread (encoded, sizeof (byte), encodedSize, inputFile)) != encodedSize)
+        if (fread (encoded, sizeof (byte), encodedSize, inputFile) != encodedSize)
         {
             printf ("Unable to read encoded partition!\n");
             return ERROR_ENCODED_FILE_BROKEN;
@@ -178,9 +182,12 @@ int DecodeMode (char *inputPath, char *outputPath)
             return ERROR_UNABLE_TO_WRITE_DATA;
         }
 
-        fflush (outputFile);
         free (encoded);
         free (decoded);
+
+        totalBytesRead += encodedSize + sizeof (ulint) * 2 + sizeof (ByteCode) * 256;
+        printf ("Partition decoded! Total decoded: %dMB.\n", (int) (totalBytesRead / (1024 * 1024)));
+        fflush (stdout);
     }
 
     fclose (inputFile);
