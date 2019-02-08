@@ -100,13 +100,13 @@ char PODVector_Insert (PODVectorHandle handle, ulint where, char *value)
 
     if (where < size - 1)
     {
-        char *position = vector->buffer + size * elementSize - 1;
+        char *position = vector->buffer + (size - 1) * elementSize;
         char *insertionPoint = vector->buffer + where * elementSize;
 
         while (position >= insertionPoint)
         {
-            *position = *(position - elementSize);
-            --position;
+            memcpy (position, position - elementSize, elementSize);
+            position -= elementSize;
         }
     }
 
@@ -133,8 +133,8 @@ char PODVector_Erase (PODVectorHandle handle, ulint position)
 
         while (current != end)
         {
-            *current = *(current + elementSize);
-            ++current;
+            memcpy (current, current + elementSize, elementSize);
+            current += elementSize;
         }
     }
 

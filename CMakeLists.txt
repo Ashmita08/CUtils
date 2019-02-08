@@ -7,7 +7,9 @@ set (CMAKE_CXX_STANDARD 11)
 
 set (CUnit_DIR "${CUNIT_SDK}/CUnit/share/cmake/")
 find_package (CUnit REQUIRED)
+find_package (OpenMP)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR} ${CUNIT_SDK}/include)
 add_subdirectory (CContainers)
 add_subdirectory (CAlgorithm)
+add_subdirectory (HuffmanCoding)
