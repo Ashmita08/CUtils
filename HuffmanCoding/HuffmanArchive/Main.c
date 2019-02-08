@@ -32,7 +32,7 @@ int ShowHelp ()
 
 int EncodeMode (char *inputPath, char *outputPath)
 {
-    byte *partition = malloc (PARTITION_SIZE);
+    byte *partition;
     FILE *inputFile = fopen (inputPath, "rb");
     FILE *outputFile = fopen (outputPath, "wb");
 
@@ -48,6 +48,7 @@ int EncodeMode (char *inputPath, char *outputPath)
         return ERROR_INCORRECT_OUTPUT_FILE;
     }
 
+    partition = malloc (PARTITION_SIZE);
     while (!feof (inputFile))
     {
         if (fgetc (inputFile) == EOF)
@@ -106,7 +107,7 @@ int DecodeMode (char *inputPath, char *outputPath)
 
     ulint encodedSize;
     ulint partitionSize;
-    ByteCode *codes = calloc (256, sizeof (ByteCode));
+    ByteCode *codes;
 
     if (inputFile == NULL)
     {
@@ -120,6 +121,7 @@ int DecodeMode (char *inputPath, char *outputPath)
         return ERROR_INCORRECT_OUTPUT_FILE;
     }
 
+    codes = calloc (256, sizeof (ByteCode));
     while (!feof (inputFile))
     {
         if (fgetc (inputFile) == EOF)
