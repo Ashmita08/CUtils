@@ -1,0 +1,61 @@
+include<stdio.h>
+ 
+int main()
+{
+        int first[30], second[30], third[30];
+ int limit_1, limit_2;
+ int i, j, k;
+        printf("\nEnter Limit For First Array:\t");
+        scanf("%d", &limit_1);
+        printf("\nEnter the Elements of Array 1:\n");    
+        for(i = 0; i < limit_1; i++)
+        {
+         scanf("%d", &first[i]);
+        }
+        printf("\nEnter Limit For Second Array:\t");
+        scanf("%d", &limit_2);
+        printf("\nEnter the Elements of Array 2:\n");
+        for(j = 0; j < limit_2; j++)
+        {
+             scanf("%d", &second[j]);
+        }
+        i = 0;
+        j = 0;
+        k = 0;
+        while((i < limit_1) && (j < limit_2))
+        {
+             if(first[i] > second[j])
+             {
+                     third[k++] = second[j++];
+             }
+             else
+             {
+                 third[k++] = first[i++];
+             }
+        }
+        while(i < limit_1) 
+        {
+            third[k++] = first[i++];
+        }
+        while(j < limit_2)
+        {
+            third[k++] = second[j++];
+        }
+        printf("\nArray 1:\n");
+        for(i = 0; i < limit_1; i++)
+        {
+             printf("%d\t", first[i]);
+        }
+        printf("\nArray 2:\n");
+        for(i = 0; i < limit_2; i++)
+        {
+             printf("%d\t", second[i]);
+        }
+        printf("\nArray 3:\n");
+        for(i = 0; i < limit_1 + limit_2; i++)
+        {
+             printf("%d\t", third[i]);
+        }
+        printf("\n");
+        return 0;
+}
