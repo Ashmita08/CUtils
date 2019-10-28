@@ -2,7 +2,7 @@ include<stdio.h>
  
 int main()
 {
-        int first[30], second[30], third[30];
+        int first[40], second[40], third[40];
  int limit_1, limit_2;
  int i, j, k;
         printf("\nEnter Limit For First Array:\t");
